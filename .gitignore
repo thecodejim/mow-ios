@@ -118,6 +118,10 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Environment configuration overrides
+Config/Secrets/*.xcconfig
+!Config/Secrets/*.example.xcconfig
+
 ### macOS
 # General
 *.DS_Store

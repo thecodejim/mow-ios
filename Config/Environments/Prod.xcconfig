@@ -1,0 +1,14 @@
+#include "../App.base.xcconfig"
+
+APP_ENVIRONMENT_NAME = prod
+APP_SWIFT_FLAGS = ENV_PROD
+API_BASE_URL = https://api.mow.codejim.com/api/v1
+DOCS_BASE_URL = https://developer.mow.codejim.com
+PORTAL_URL = https://admin.mow.codejim.com
+TELEMETRY_URL = https://otel.mow.codejim.com
+HEALTH_CHECK_TOKEN = prod-token-placeholder
+USE_MOCK_DATA = NO
+LOG_LEVEL = WARN
+
+#include? "../Secrets/Prod.secrets.xcconfig"
+
