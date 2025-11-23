@@ -1,14 +1,17 @@
 #include "../App.base.xcconfig"
 
 APP_ENVIRONMENT_NAME = local-dev
-APP_SWIFT_FLAGS = ENV_LOCAL_DEV
-API_BASE_URL = http://localhost:8000/api/v1
-DOCS_BASE_URL = http://developer.localhost
-PORTAL_URL = http://admin.localhost
-TELEMETRY_URL = http://localhost:4318
-HEALTH_CHECK_TOKEN = local-dev-token
-USE_MOCK_DATA = YES
-LOG_LEVEL = DEBUG
+APP_SWIFT_FLAGS      = ENV_LOCAL_DEV
+API_SCHEME           = http
+API_HOST_AND_PATH    = localhost:8000/api/v1
+DOCS_SCHEME          = http
+DOCS_HOST            = developer.localhost
+PORTAL_SCHEME        = http
+PORTAL_HOST          = admin.localhost
+TELEMETRY_SCHEME     = http
+TELEMETRY_HOST_PORT  = localhost:4318
+HEALTH_CHECK_TOKEN   = local-dev-token
+USE_MOCK_DATA        = YES
+LOG_LEVEL            = DEBUG
 
 #include? "../Secrets/LocalDev.secrets.xcconfig"
-

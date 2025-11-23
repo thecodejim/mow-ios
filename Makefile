@@ -74,3 +74,4 @@ devices: ## List available simulators
 archive-prod: ## Archive the Prod build (outputs to ./build)
 	$(XCODEBUILD) -configuration Prod -archivePath $(ARCHIVE_PATH) archive
 
+

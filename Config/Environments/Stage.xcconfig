@@ -2,13 +2,14 @@
 
 APP_ENVIRONMENT_NAME = stage
 APP_SWIFT_FLAGS = ENV_STAGE
-API_BASE_URL = https://stage.api.mow.codejim.com/api/v1
-DOCS_BASE_URL = https://developer-stage.mow.codejim.com
-PORTAL_URL = https://admin-stage.mow.codejim.com
-TELEMETRY_URL = https://otel-stage.mow.codejim.com
+API_BASE_URL = "https://stage.api.mow.codejim.com/api/v1"
+DOCS_BASE_URL = "https://developer-stage.mow.codejim.com"
+PORTAL_URL = "https://admin-stage.mow.codejim.com"
+TELEMETRY_URL = "https://otel-stage.mow.codejim.com"
 HEALTH_CHECK_TOKEN = stage-token-placeholder
 USE_MOCK_DATA = NO
 LOG_LEVEL = INFO
 
 #include? "../Secrets/Stage.secrets.xcconfig"
+
 
