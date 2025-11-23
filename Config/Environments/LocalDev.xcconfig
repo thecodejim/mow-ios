@@ -10,7 +10,7 @@ PORTAL_SCHEME        = http
 PORTAL_HOST          = admin.localhost
 TELEMETRY_SCHEME     = http
 TELEMETRY_HOST_PORT  = localhost:4318
-HEALTH_CHECK_TOKEN   = local-dev-token
+HEALTH_CHECK_TOKEN   = local-dev-token-placeholder
 USE_MOCK_DATA        = YES
 LOG_LEVEL            = DEBUG
 

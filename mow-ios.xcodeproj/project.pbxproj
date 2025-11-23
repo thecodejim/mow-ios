@@ -20,6 +20,9 @@
 		8ED2B0382ED225A00054F396 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		8ED2B0392ED225A00054F396 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		8ED2B05F2ED268210054F396 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		8ED2B0722ED377A20054F396 /* LocalDev.secrets.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = LocalDev.secrets.example.xcconfig; sourceTree = "<group>"; };
+		8ED2B0732ED377A20054F396 /* Prod.secrets.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Prod.secrets.example.xcconfig; sourceTree = "<group>"; };
+		8ED2B0742ED377A20054F396 /* Stage.secrets.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Stage.secrets.example.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -79,6 +82,7 @@
 				8ED2B05F2ED268210054F396 /* README.md */,
 				8EAA00012F07438D00D61F5E /* App.base.xcconfig */,
 				8EAA00062F07438D00D61F5E /* Environments */,
+				8ED2B0752ED377A20054F396 /* Secrets */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -91,6 +95,16 @@
 				8EAA00042F07438D00D61F5E /* Prod.xcconfig */,
 			);
 			path = Environments;
+			sourceTree = "<group>";
+		};
+		8ED2B0752ED377A20054F396 /* Secrets */ = {
+			isa = PBXGroup;
+			children = (
+				8ED2B0722ED377A20054F396 /* LocalDev.secrets.example.xcconfig */,
+				8ED2B0732ED377A20054F396 /* Prod.secrets.example.xcconfig */,
+				8ED2B0742ED377A20054F396 /* Stage.secrets.example.xcconfig */,
+			);
+			path = Secrets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

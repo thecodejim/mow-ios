@@ -3,13 +3,13 @@
 APP_ENVIRONMENT_NAME = stage
 APP_SWIFT_FLAGS      = ENV_STAGE
 API_SCHEME           = https
-API_HOST_AND_PATH    = stage.api.mow.codejim.com/api/v1
+API_HOST_AND_PATH    = api.stage.mow.codejim.com/api/v1
 DOCS_SCHEME          = https
-DOCS_HOST            = developer-stage.mow.codejim.com
+DOCS_HOST            = developer.stage.mow.codejim.com
 PORTAL_SCHEME        = https
-PORTAL_HOST          = admin-stage.mow.codejim.com
+PORTAL_HOST          = admin.stage.mow.codejim.com
 TELEMETRY_SCHEME     = https
-TELEMETRY_HOST_PORT  = otel-stage.mow.codejim.com
+TELEMETRY_HOST_PORT  = otel.stage.mow.codejim.com
 HEALTH_CHECK_TOKEN   = stage-token-placeholder
 USE_MOCK_DATA        = NO
 LOG_LEVEL            = INFO
