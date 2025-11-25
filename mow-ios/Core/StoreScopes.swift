@@ -23,4 +23,3 @@ typealias HomeScopedStore = StoreScope<
     HomeDomain.State,
     HomeDomain.Action
 >
-

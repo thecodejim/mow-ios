@@ -107,4 +107,3 @@ enum OnboardingDomain {
         }
     }
 }
-

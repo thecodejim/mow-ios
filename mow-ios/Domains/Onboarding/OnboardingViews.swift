@@ -167,4 +167,3 @@ private struct OnboardingActionBar: View {
     )
     return OnboardingCoordinatorView(store: scopedStore)
 }
-

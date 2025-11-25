@@ -1,10 +1,3 @@
-//
-//  MowApp.swift
-//  mow-ios
-//
-//  Created by James Smith on 11/22/25.
-//
-
 import Combine
 import SwiftUI
 

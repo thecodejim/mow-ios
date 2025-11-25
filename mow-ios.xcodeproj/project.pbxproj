@@ -23,7 +23,6 @@
 		8ECEDBF42ED533EB00A79F73 /* MowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECEDBE52ED533EB00A79F73 /* MowApp.swift */; };
 		8ECEDBF52ED533EB00A79F73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8ECEDBE32ED533EB00A79F73 /* Assets.xcassets */; };
 		8ED2B03A2ED225A00054F396 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 8ED2B0392ED225A00054F396 /* README.md */; };
-		8ED2B03B2ED225A10054F396 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 8ED2B0382ED225A00054F396 /* Makefile */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,7 +47,6 @@
 		8ECEDBE32ED533EB00A79F73 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8ECEDBE42ED533EB00A79F73 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8ECEDBE52ED533EB00A79F73 /* MowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MowApp.swift; sourceTree = "<group>"; };
-		8ED2B0382ED225A00054F396 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		8ED2B0392ED225A00054F396 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		8ED2B05F2ED268210054F396 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		8ED2B0722ED377A20054F396 /* LocalDev.secrets.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = LocalDev.secrets.example.xcconfig; sourceTree = "<group>"; };
@@ -71,7 +69,6 @@
 			isa = PBXGroup;
 			children = (
 				8ED2B0392ED225A00054F396 /* README.md */,
-				8ED2B0382ED225A00054F396 /* Makefile */,
 				8EAA00052F07438D00D61F5E /* Config */,
 				8ECEDBE62ED533EB00A79F73 /* mow-ios */,
 				8E31748B2ED2033000D35843 /* Products */,
@@ -283,7 +280,6 @@
 				8ECEDBF22ED533EB00A79F73 /* OnboardingViews.swift in Sources */,
 				8ECEDBF32ED533EB00A79F73 /* AppEnvironment.swift in Sources */,
 				8ECEDBF42ED533EB00A79F73 /* MowApp.swift in Sources */,
-				8ED2B03B2ED225A10054F396 /* Makefile in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

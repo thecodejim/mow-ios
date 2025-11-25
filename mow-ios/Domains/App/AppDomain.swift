@@ -37,7 +37,7 @@ enum AppDomain {
             state.route = .home(.init())
             return .none
 
-        case let .onboarding(.delegate(.finished)):
+        case .onboarding(.delegate(.finished)):
             state.route = .login(.init())
             return .none
 
@@ -53,7 +53,7 @@ enum AppDomain {
             state.route = .onboarding(childState)
             return effect.map(Action.onboarding)
 
-        case let .login(.delegate(.authenticated)):
+        case .login(.delegate(.authenticated)):
             state.route = .home(.init())
             return .none
 
@@ -91,5 +91,3 @@ enum AppDomain {
         }
     }
 }
-
-

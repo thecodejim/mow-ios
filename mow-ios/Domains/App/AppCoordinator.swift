@@ -80,4 +80,3 @@ struct AppCoordinatorView: View {
         .animation(.easeInOut, value: coordinator.route)
     }
 }
-

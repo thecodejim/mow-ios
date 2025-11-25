@@ -205,4 +205,3 @@ private struct ForgotPasswordView: View {
     )
     return LoginCoordinatorView(store: scopedStore)
 }
-

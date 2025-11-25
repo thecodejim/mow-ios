@@ -165,4 +165,3 @@ struct MockAnalyticsService: AnalyticsService {
         #endif
     }
 }
-

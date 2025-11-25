@@ -210,4 +210,3 @@ private struct ProfileView: View {
     )
     return HomeCoordinatorView(store: scopedStore)
 }
-
