@@ -1,5 +1,4 @@
 import Combine
-import Foundation
 
 struct Effect<Action: Sendable>: Sendable {
     private let operation: @Sendable () async -> Action?

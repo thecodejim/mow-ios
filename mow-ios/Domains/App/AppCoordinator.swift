@@ -1,5 +1,4 @@
 import Combine
-import SwiftUI
 
 @MainActor
 final class AppCoordinator: ObservableObject {
@@ -60,23 +59,5 @@ final class AppCoordinator: ObservableObject {
                 self?.route = route
             }
             .store(in: &cancellables)
-    }
-}
-
-struct AppCoordinatorView: View {
-    @ObservedObject var coordinator: AppCoordinator
-
-    var body: some View {
-        Group {
-            switch coordinator.route {
-            case .onboarding:
-                OnboardingCoordinatorView(store: coordinator.onboardingStore)
-            case .login:
-                LoginCoordinatorView(store: coordinator.loginStore)
-            case .home:
-                HomeCoordinatorView(store: coordinator.homeStore)
-            }
-        }
-        .animation(.easeInOut, value: coordinator.route)
     }
 }
