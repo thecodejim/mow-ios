@@ -206,15 +206,15 @@ private struct ProfileView: View {
                 } footer: {
                     Text("Logging out clears cached credentials stored in the secure enclave.")
                 }
-
-                Section {
-                    DebugInfoButton()
-                        .frame(maxWidth: .infinity)
-                } header: {
-                    Text("About")
-                }
             }
             .navigationTitle("Profile")
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 8) {
+                    DebugInfoButton()
+                        .frame(maxWidth: .infinity)
+                }
+                .padding(.bottom, 24)
+            }
         }
     }
 }
