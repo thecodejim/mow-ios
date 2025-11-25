@@ -113,6 +113,9 @@ private struct LoginScreen: View {
             .disabled(store.state.isSubmitting)
 
             Spacer()
+
+            DebugInfoButton()
+                .frame(maxWidth: .infinity)
         }
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
