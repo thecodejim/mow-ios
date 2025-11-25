@@ -10,6 +10,7 @@
 		8EC56E5E2ED6008600FA6B0F /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56E5D2ED6008600FA6B0F /* AppRootView.swift */; };
 		8EC56E602ED623D600FA6B0F /* OnboardingDomain+Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56E5F2ED623CF00FA6B0F /* OnboardingDomain+Content.swift */; };
 		8EC56E622ED6243900FA6B0F /* HomeDomain+Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56E612ED6243400FA6B0F /* HomeDomain+Content.swift */; };
+		8EC56E642ED62D8C00FA6B0F /* LoginDomain+Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56E632ED62D8C00FA6B0F /* LoginDomain+Content.swift */; };
 		8ECEDBE72ED533EB00A79F73 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECEDBCE2ED533EB00A79F73 /* AppCoordinator.swift */; };
 		8ECEDBE82ED533EB00A79F73 /* BusyOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECEDBD02ED533EB00A79F73 /* BusyOverlay.swift */; };
 		8ECEDBE92ED533EB00A79F73 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECEDBD22ED533EB00A79F73 /* AppDependencies.swift */; };
@@ -37,6 +38,7 @@
 		8EC56E5D2ED6008600FA6B0F /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
 		8EC56E5F2ED623CF00FA6B0F /* OnboardingDomain+Content.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnboardingDomain+Content.swift"; sourceTree = "<group>"; };
 		8EC56E612ED6243400FA6B0F /* HomeDomain+Content.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeDomain+Content.swift"; sourceTree = "<group>"; };
+		8EC56E632ED62D8C00FA6B0F /* LoginDomain+Content.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoginDomain+Content.swift"; sourceTree = "<group>"; };
 		8ECEDBCE2ED533EB00A79F73 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		8ECEDBD02ED533EB00A79F73 /* BusyOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusyOverlay.swift; sourceTree = "<group>"; };
 		8ECEDBD22ED533EB00A79F73 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 			isa = PBXGroup;
 			children = (
 				8ECEDBDB2ED533EB00A79F73 /* LoginDomain.swift */,
+				8EC56E632ED62D8C00FA6B0F /* LoginDomain+Content.swift */,
 				8ECEDBDC2ED533EB00A79F73 /* LoginViews.swift */,
 			);
 			path = Login;
@@ -278,6 +281,7 @@
 				8ECEDBE72ED533EB00A79F73 /* AppCoordinator.swift in Sources */,
 				8ECEDBE82ED533EB00A79F73 /* BusyOverlay.swift in Sources */,
 				8ECEDBE92ED533EB00A79F73 /* AppDependencies.swift in Sources */,
+				8EC56E642ED62D8C00FA6B0F /* LoginDomain+Content.swift in Sources */,
 				8ECEDBEA2ED533EB00A79F73 /* Store.swift in Sources */,
 				8ECEDBEB2ED533EB00A79F73 /* StoreScopes.swift in Sources */,
 				8ECEDBEC2ED533EB00A79F73 /* AppDomain.swift in Sources */,

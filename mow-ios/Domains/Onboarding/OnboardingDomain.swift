@@ -59,8 +59,10 @@ enum OnboardingDomain {
             }
             return .fireAndForget {
                 await environment.analytics.track(
-                    event: "onboarding_viewed",
-                    metadata: ["environment": environment.appEnvironment.name.rawValue]
+                    event: OnboardingDomain.AnalyticsEvent.viewed,
+                    metadata: [
+                        OnboardingDomain.AnalyticsMetadataKey.environment: environment.appEnvironment.name.rawValue
+                    ]
                 )
             }
 
@@ -73,8 +75,8 @@ enum OnboardingDomain {
                 let stepIndex = loadedState.currentIndex
                 return .fireAndForget {
                     await environment.analytics.track(
-                        event: "onboarding_step",
-                        metadata: ["step": "\(stepIndex)"]
+                        event: OnboardingDomain.AnalyticsEvent.step,
+                        metadata: [OnboardingDomain.AnalyticsMetadataKey.step: "\(stepIndex)"]
                     )
                 }
             } else {
@@ -115,7 +117,7 @@ enum OnboardingDomain {
             loadedState.isCompleting = false
             state = .loaded(loadedState)
             return .task {
-                await environment.analytics.track(event: "onboarding_completed", metadata: [:])
+                await environment.analytics.track(event: OnboardingDomain.AnalyticsEvent.completed, metadata: [:])
                 return .delegate(.finished)
             }
 

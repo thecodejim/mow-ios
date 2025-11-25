@@ -1,6 +1,19 @@
+extension OnboardingDomain {
+    enum AnalyticsEvent {
+        static let viewed = "onboarding_viewed"
+        static let step = "onboarding_step"
+        static let completed = "onboarding_completed"
+    }
+
+    enum AnalyticsMetadataKey {
+        static let environment = "environment"
+        static let step = "step"
+    }
+}
+
 extension OnboardingDomain.State.Step {
-    static let catalog: [OnboardingDomain.State.Step] = [
-        OnboardingDomain.State.Step(
+    static let catalog: [Self] = [
+        .init(
             id: 0,
             title: "Plan your day",
             message: "Line up routes, meals, and reminders in one place.",
@@ -8,7 +21,7 @@ extension OnboardingDomain.State.Step {
             icon: "calendar.badge.clock",
             accent: .mint
         ),
-        OnboardingDomain.State.Step(
+        .init(
             id: 1,
             title: "Stay in sync",
             message: "Coordinators see your status in real time.",
@@ -16,7 +29,7 @@ extension OnboardingDomain.State.Step {
             icon: "point.3.connected.trianglepath.dotted",
             accent: .orange
         ),
-        OnboardingDomain.State.Step(
+        .init(
             id: 2,
             title: "Deliver with confidence",
             message: "Meals, dietary notes, and wellness flags travel with you.",

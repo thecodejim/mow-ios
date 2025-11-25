@@ -40,8 +40,16 @@ enum HomeDomain {
                 let trend: String
             }
 
-            var headline = "You're ready for today."
-            var stats: [Stat] = []
+            var headline: String
+            var stats: [Stat]
+
+            init(
+                headline: String = Self.defaultHeadline,
+                stats: [Stat] = []
+            ) {
+                self.headline = headline
+                self.stats = stats
+            }
         }
 
         struct Meals: Equatable, Sendable {
@@ -143,7 +151,7 @@ enum HomeDomain {
                     let snapshot = try await environment.api.fetchHomeSnapshot()
                     return .refreshResponse(.success(snapshot))
                 } catch {
-                    let message = (error as? LocalizedError)?.errorDescription ?? "Unable to refresh right now."
+                    let message = (error as? LocalizedError)?.errorDescription ?? HomeDomain.Copy.refreshFallbackError
                     return .refreshResponse(.failure(.message(message)))
                 }
             }

@@ -43,12 +43,22 @@ enum LoginDomain {
         }
 
         struct LoginForm: Equatable, Sendable {
-            var email = "volunteer@example.com"
-            var password = "password"
-            var isSecureEntry = true
+            var email: String
+            var password: String
+            var isSecureEntry: Bool
+
+            init(
+                email: String = Self.defaultEmail,
+                password: String = Self.defaultPassword,
+                isSecureEntry: Bool = true
+            ) {
+                self.email = email
+                self.password = password
+                self.isSecureEntry = isSecureEntry
+            }
 
             var isValid: Bool {
-                email.isValidEmail && password.count >= 4
+                email.isValidEmail && password.count >= Self.minPasswordLength
             }
         }
         
@@ -103,7 +113,7 @@ enum LoginDomain {
                 state = .loaded(.init())
             }
             return .fireAndForget {
-                await environment.analytics.track(event: "login_viewed", metadata: [:])
+                await environment.analytics.track(event: LoginDomain.AnalyticsEvent.loginViewed, metadata: [:])
             }
 
         case let .emailChanged(email):
@@ -128,12 +138,12 @@ enum LoginDomain {
             let loadedState = state.currentLoadedState()
 
             guard loadedState.form.email.isValidEmail else {
-                state = .error(.init(form: loadedState.form, message: "Please enter a valid email."))
+                state = .error(.init(form: loadedState.form, message: LoginDomain.Copy.invalidEmail))
                 return .none
             }
 
-            guard loadedState.form.password.count >= 4 else {
-                state = .error(.init(form: loadedState.form, message: "Your password should be at least 4 characters."))
+            guard loadedState.form.password.count >= LoginDomain.State.LoginForm.minPasswordLength else {
+                state = .error(.init(form: loadedState.form, message: LoginDomain.Copy.passwordTooShort))
                 return .none
             }
 
@@ -145,11 +155,14 @@ enum LoginDomain {
                 do {
                     let session = try await environment.api.login(email: email, password: password)
                     try await environment.keychain.save(token: session.token)
-                    await environment.analytics.track(event: "login_success", metadata: [:])
+                    await environment.analytics.track(event: LoginDomain.AnalyticsEvent.loginSuccess, metadata: [:])
                     return .loginResponse(.success(session))
                 } catch {
-                    let message = (error as? LocalizedError)?.errorDescription ?? "We hit a snag signing you in."
-                    await environment.analytics.track(event: "login_failure", metadata: ["reason": message])
+                    let message = (error as? LocalizedError)?.errorDescription ?? LoginDomain.Copy.loginFallbackError
+                    await environment.analytics.track(
+                        event: LoginDomain.AnalyticsEvent.loginFailure,
+                        metadata: ["reason": message]
+                    )
                     return .loginResponse(.failure(.service(message)))
                 }
             }
@@ -185,7 +198,7 @@ enum LoginDomain {
             guard case var .forgotPassword(forgotState) = state else { return .none }
 
             guard forgotState.email.isValidEmail else {
-                forgotState.status = .failure(message: "Please enter a valid email address.")
+                forgotState.status = .failure(message: LoginDomain.Copy.forgotInvalidEmail)
                 state = .forgotPassword(forgotState)
                 return .none
             }
@@ -198,10 +211,10 @@ enum LoginDomain {
             return .task {
                 do {
                     try await environment.api.sendPasswordReset(email: email)
-                    await environment.analytics.track(event: "login_reset_requested", metadata: [:])
+                    await environment.analytics.track(event: LoginDomain.AnalyticsEvent.resetRequested, metadata: [:])
                     return .resetResponse(.success)
                 } catch {
-                    let message = (error as? LocalizedError)?.errorDescription ?? "We could not send that reset."
+                    let message = (error as? LocalizedError)?.errorDescription ?? LoginDomain.Copy.resetFallbackError
                     return .resetResponse(.failure(.service(message)))
                 }
             }
@@ -211,7 +224,7 @@ enum LoginDomain {
 
             switch result {
             case .success:
-                forgotState.status = .success(message: "We sent a magic link to \(forgotState.email).")
+                forgotState.status = .success(message: LoginDomain.Copy.resetSuccessMessage(forEmail: forgotState.email))
             case let .failure(error):
                 forgotState.status = .failure(message: error.message)
             }
