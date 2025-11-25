@@ -1,10 +1,20 @@
 import Foundation
 
 enum OnboardingDomain {
-    struct State: Equatable, Sendable {
-        var steps: [Step] = Step.catalog
-        var currentIndex = 0
-        var isLoading = false
+    enum State: Equatable, Sendable {
+        case loading
+        case loaded(LoadedState)
+        case error(ErrorState)
+
+        struct LoadedState: Equatable, Sendable {
+            var steps: [Step] = Step.catalog
+            var currentIndex = 0
+            var isCompleting = false
+        }
+
+        struct ErrorState: Equatable, Sendable {
+            var message: String
+        }
     }
 
     struct Environment: @unchecked Sendable {
@@ -50,6 +60,9 @@ enum OnboardingDomain {
     static func reducer(state: inout State, action: Action, environment: Environment) -> Effect<Action> {
         switch action {
         case .onAppear:
+            if case .loading = state {
+                state = .loaded(.init())
+            }
             return .fireAndForget {
                 await environment.analytics.track(
                     event: "onboarding_viewed",
@@ -58,11 +71,12 @@ enum OnboardingDomain {
             }
 
         case .advance:
-            guard !state.isLoading else { return .none }
+            guard case var .loaded(loadedState) = state, !loadedState.isCompleting else { return .none }
 
-            if state.currentIndex < state.steps.count - 1 {
-                state.currentIndex += 1
-                let stepIndex = state.currentIndex
+            if loadedState.currentIndex < loadedState.steps.count - 1 {
+                loadedState.currentIndex += 1
+                state = .loaded(loadedState)
+                let stepIndex = loadedState.currentIndex
                 return .fireAndForget {
                     await environment.analytics.track(
                         event: "onboarding_step",
@@ -70,7 +84,8 @@ enum OnboardingDomain {
                     )
                 }
             } else {
-                state.isLoading = true
+                loadedState.isCompleting = true
+                state = .loaded(loadedState)
                 return .task {
                     try? await Task.sleep(nanoseconds: 900_000_000)
                     return .finished
@@ -78,25 +93,33 @@ enum OnboardingDomain {
             }
 
         case .back:
-            guard state.currentIndex > 0 else { return .none }
-            state.currentIndex -= 1
+            guard case var .loaded(loadedState) = state, loadedState.currentIndex > 0 else { return .none }
+            loadedState.currentIndex -= 1
+            state = .loaded(loadedState)
             return .none
 
         case .skip:
-            guard !state.isLoading else { return .none }
-            state.isLoading = true
+            guard case var .loaded(loadedState) = state, !loadedState.isCompleting else { return .none }
+            loadedState.isCompleting = true
+            state = .loaded(loadedState)
             return .task {
                 try? await Task.sleep(nanoseconds: 500_000_000)
                 return .finished
             }
 
         case let .setIndex(newIndex):
-            guard newIndex >= 0, newIndex < state.steps.count else { return .none }
-            state.currentIndex = newIndex
+            guard case var .loaded(loadedState) = state,
+                  newIndex >= 0,
+                  newIndex < loadedState.steps.count
+            else { return .none }
+            loadedState.currentIndex = newIndex
+            state = .loaded(loadedState)
             return .none
 
         case .finished:
-            state.isLoading = false
+            guard case var .loaded(loadedState) = state else { return .none }
+            loadedState.isCompleting = false
+            state = .loaded(loadedState)
             return .task {
                 await environment.analytics.track(event: "onboarding_completed", metadata: [:])
                 return .delegate(.finished)
@@ -105,5 +128,11 @@ enum OnboardingDomain {
         case .delegate:
             return .none
         }
+    }
+}
+
+extension OnboardingDomain.State {
+    init() {
+        self = .loaded(.init())
     }
 }

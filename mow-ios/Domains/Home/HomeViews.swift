@@ -13,52 +13,83 @@ private struct HomeTabView: View {
 
     private var selection: Binding<HomeDomain.Tab> {
         Binding(
-            get: { store.state.selectedTab },
+            get: { store.state.currentTab },
             set: { store.send(.selectTab($0)) }
         )
     }
 
     var body: some View {
+        content
+            .task {
+                store.send(.onAppear)
+            }
+            .alert(
+                "Heads up",
+                isPresented: Binding(
+                    get: { store.state.alertMessage != nil },
+                    set: { if !$0 { store.send(.clearAlert) } }
+                ),
+                actions: {},
+                message: {
+                    Text(store.state.alertMessage ?? "")
+                }
+            )
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch store.state {
+        case .loading:
+            ProgressView("Loading your day…")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        case let .error(errorState):
+            VStack(spacing: 16) {
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.largeTitle)
+                    .foregroundStyle(.orange)
+                Text(errorState.message)
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                Button("Try again") {
+                    store.send(.refresh)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        case let .loaded(loadedState):
+            loadedContent(for: loadedState, isRefreshing: false)
+        case let .refreshing(loadedState):
+            loadedContent(for: loadedState, isRefreshing: true)
+        }
+    }
+
+    private func loadedContent(for state: HomeDomain.State.LoadedState, isRefreshing: Bool) -> some View {
         TabView(selection: selection) {
             DashboardView(
-                state: store.state.dashboard,
-                isRefreshing: store.state.isRefreshing,
+                state: state.dashboard,
+                isRefreshing: isRefreshing,
                 onRefresh: { store.send(.refresh) }
             )
             .tabItem { Label(HomeDomain.Tab.dashboard.title, systemImage: HomeDomain.Tab.dashboard.icon) }
             .tag(HomeDomain.Tab.dashboard)
 
-            MealsView(meals: store.state.meals)
+            MealsView(meals: state.meals)
                 .tabItem { Label(HomeDomain.Tab.meals.title, systemImage: HomeDomain.Tab.meals.icon) }
                 .tag(HomeDomain.Tab.meals)
 
-            DeliveriesView(deliveries: store.state.deliveries)
+            DeliveriesView(deliveries: state.deliveries)
                 .tabItem { Label(HomeDomain.Tab.deliveries.title, systemImage: HomeDomain.Tab.deliveries.icon) }
                 .tag(HomeDomain.Tab.deliveries)
 
-            ProfileView(profile: store.state.profile, onLogout: { store.send(.logoutTapped) })
+            ProfileView(profile: state.profile, onLogout: { store.send(.logoutTapped) })
                 .tabItem { Label(HomeDomain.Tab.profile.title, systemImage: HomeDomain.Tab.profile.icon) }
                 .tag(HomeDomain.Tab.profile)
         }
         .overlay {
-            if store.state.isRefreshing {
+            if isRefreshing {
                 BusyOverlay(text: "Syncing your routes…")
             }
         }
-        .task {
-            store.send(.onAppear)
-        }
-        .alert(
-            "Heads up",
-            isPresented: Binding(
-                get: { store.state.alertMessage != nil },
-                set: { if !$0 { store.send(.clearAlert) } }
-            ),
-            actions: {},
-            message: {
-                Text(store.state.alertMessage ?? "")
-            }
-        )
     }
 }
 
@@ -215,4 +246,26 @@ private struct ProfileView: View {
         action: AppDomain.Action.home
     )
     return HomeCoordinatorView(store: scopedStore)
+}
+
+private extension HomeDomain.State {
+    var currentTab: HomeDomain.Tab {
+        switch self {
+        case let .loaded(state), let .refreshing(state):
+            return state.selectedTab
+        case let .error(errorState):
+            return errorState.previousState?.selectedTab ?? .dashboard
+        case .loading:
+            return .dashboard
+        }
+    }
+
+    var alertMessage: String? {
+        switch self {
+        case let .loaded(state), let .refreshing(state):
+            return state.alertMessage
+        default:
+            return nil
+        }
+    }
 }

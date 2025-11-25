@@ -28,7 +28,26 @@ enum HomeDomain {
         }
     }
 
-    struct State: Equatable, Sendable {
+    enum State: Equatable, Sendable {
+        case loading
+        case loaded(LoadedState)
+        case refreshing(LoadedState)
+        case error(ErrorState)
+
+        struct LoadedState: Equatable, Sendable {
+            var selectedTab: Tab = .dashboard
+            var dashboard = Dashboard()
+            var meals = Meals()
+            var deliveries = Deliveries()
+            var profile = Profile()
+            var alertMessage: String?
+        }
+
+        struct ErrorState: Equatable, Sendable {
+            var message: String
+            var previousState: LoadedState?
+        }
+
         struct Dashboard: Equatable, Sendable {
             struct Stat: Identifiable, Equatable, Sendable {
                 let id = UUID()
@@ -68,14 +87,6 @@ enum HomeDomain {
             var role = ""
             var territory = ""
         }
-
-        var selectedTab: Tab = .dashboard
-        var dashboard = Dashboard()
-        var meals = Meals()
-        var deliveries = Deliveries()
-        var profile = Profile()
-        var isRefreshing = false
-        var alertMessage: String?
     }
 
     struct Environment: @unchecked Sendable {
@@ -109,16 +120,44 @@ enum HomeDomain {
     static func reducer(state: inout State, action: Action, environment: Environment) -> Effect<Action> {
         switch action {
         case .onAppear:
-            guard state.dashboard.stats.isEmpty else { return .none }
-            return .send(.refresh)
+            switch state {
+            case .loading:
+                return .send(.refresh)
+            case let .loaded(loadedState):
+                guard loadedState.dashboard.stats.isEmpty else { return .none }
+                return .send(.refresh)
+            case .refreshing:
+                return .none
+            case .error:
+                return .send(.refresh)
+            }
 
         case let .selectTab(tab):
-            state.selectedTab = tab
+            if case var .loaded(loadedState) = state {
+                loadedState.selectedTab = tab
+                state = .loaded(loadedState)
+            } else if case var .refreshing(loadedState) = state {
+                loadedState.selectedTab = tab
+                state = .refreshing(loadedState)
+            }
             return .none
 
         case .refresh:
-            guard !state.isRefreshing else { return .none }
-            state.isRefreshing = true
+            switch state {
+            case .loading:
+                break
+            case let .loaded(loadedState):
+                state = .refreshing(loadedState)
+            case .refreshing:
+                return .none
+            case let .error(errorState):
+                if let previous = errorState.previousState {
+                    state = .refreshing(previous)
+                } else {
+                    state = .loading
+                }
+            }
+
             return .task {
                 do {
                     let snapshot = try await environment.api.fetchHomeSnapshot()
@@ -130,18 +169,44 @@ enum HomeDomain {
             }
 
         case let .refreshResponse(result):
-            state.isRefreshing = false
             switch result {
             case let .success(snapshot):
-                state.dashboard.headline = snapshot.headline
-                state.dashboard.stats = snapshot.stats.map { .init(label: $0.label, value: $0.value, trend: $0.trend) }
-                state.meals.items = snapshot.meals.map { .init(title: $0.title, calories: $0.calories, deliveryTime: $0.deliveryTime) }
-                state.deliveries.items = snapshot.deliveries.map { .init(recipient: $0.recipient, address: $0.address, distance: $0.distanceMiles) }
-                state.profile.name = snapshot.profile.name
-                state.profile.role = snapshot.profile.role
-                state.profile.territory = snapshot.profile.territory
+                var loadedState: State.LoadedState
+                if case let .refreshing(current) = state {
+                    loadedState = current
+                } else if case let .loaded(current) = state {
+                    loadedState = current
+                } else if case let .error(errorState) = state, let previous = errorState.previousState {
+                    loadedState = previous
+                } else {
+                    loadedState = .init()
+                }
+
+                loadedState.dashboard.headline = snapshot.headline
+                loadedState.dashboard.stats = snapshot.stats.map { .init(label: $0.label, value: $0.value, trend: $0.trend) }
+                loadedState.meals.items = snapshot.meals.map { .init(title: $0.title, calories: $0.calories, deliveryTime: $0.deliveryTime) }
+                loadedState.deliveries.items = snapshot.deliveries.map { .init(recipient: $0.recipient, address: $0.address, distance: $0.distanceMiles) }
+                loadedState.profile.name = snapshot.profile.name
+                loadedState.profile.role = snapshot.profile.role
+                loadedState.profile.territory = snapshot.profile.territory
+                loadedState.alertMessage = nil
+
+                state = .loaded(loadedState)
+
             case let .failure(error):
-                state.alertMessage = error.description
+                switch state {
+                case var .refreshing(loadedState):
+                    loadedState.alertMessage = error.description
+                    state = .loaded(loadedState)
+                case var .loaded(loadedState):
+                    loadedState.alertMessage = error.description
+                    state = .loaded(loadedState)
+                case .loading:
+                    state = .error(.init(message: error.description, previousState: nil))
+                case var .error(errorState):
+                    errorState.message = error.description
+                    state = .error(errorState)
+                }
             }
             return .none
 
@@ -149,11 +214,23 @@ enum HomeDomain {
             return .send(.delegate(.logout))
 
         case .clearAlert:
-            state.alertMessage = nil
+            if case var .loaded(loadedState) = state {
+                loadedState.alertMessage = nil
+                state = .loaded(loadedState)
+            } else if case var .refreshing(loadedState) = state {
+                loadedState.alertMessage = nil
+                state = .refreshing(loadedState)
+            }
             return .none
 
         case .delegate:
             return .none
         }
+    }
+}
+
+extension HomeDomain.State {
+    init() {
+        self = .loading
     }
 }

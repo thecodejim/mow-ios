@@ -2,34 +2,56 @@ import Foundation
 
 enum LoginDomain {
     struct State: Equatable, Sendable {
-        struct LoginForm: Equatable, Sendable {
-            var email = "volunteer@example.com"
-            var password = "password"
-            var errorMessage: String?
-            var isSecureEntry = true
+        var view: ViewState
 
-            var isValid: Bool {
-                email.isValidEmail && password.count >= 4
-            }
+        init(view: ViewState = .loaded(.init())) {
+            self.view = view
+        }
+    }
+
+    enum ViewState: Equatable, Sendable {
+        case loading
+        case loaded(LoadedState)
+        case submitting(LoadedState)
+        case forgotPassword(ForgotPasswordState)
+        case authenticated(AuthSession)
+        case error(ErrorState)
+    }
+
+    struct LoadedState: Equatable, Sendable {
+        var form: LoginForm
+
+        init(form: LoginForm = .init()) {
+            self.form = form
+        }
+    }
+
+    struct ErrorState: Equatable, Sendable {
+        var form: LoginForm
+        var message: String
+    }
+
+    struct LoginForm: Equatable, Sendable {
+        var email = "volunteer@example.com"
+        var password = "password"
+        var isSecureEntry = true
+
+        var isValid: Bool {
+            email.isValidEmail && password.count >= 4
+        }
+    }
+
+    struct ForgotPasswordState: Equatable, Sendable {
+        enum Status: Equatable, Sendable {
+            case idle
+            case sending
+            case success(message: String)
+            case failure(message: String)
         }
 
-        struct ForgotPassword: Equatable, Sendable {
-            enum Status: Equatable, Sendable {
-                case idle
-                case success(message: String)
-                case failure(message: String)
-            }
-
-            var email = ""
-            var status: Status = .idle
-        }
-
-        var form = LoginForm()
-        var forgot = ForgotPassword()
-        var route: Route?
-        var isLoading = false
-        var isAuthenticated = false
-        var session: AuthSession?
+        var email = ""
+        var status: Status = .idle
+        var resume: LoadedState = .init()
     }
 
     struct Environment: @unchecked Sendable {
@@ -37,10 +59,6 @@ enum LoginDomain {
         let api: any APIService
         let keychain: any KeychainService
         let analytics: any AnalyticsService
-    }
-
-    enum Route: Hashable, Sendable {
-        case forgotPassword
     }
 
     enum DomainError: Error, Equatable, Sendable {
@@ -89,42 +107,47 @@ enum LoginDomain {
     static func reducer(state: inout State, action: Action, environment: Environment) -> Effect<Action> {
         switch action {
         case .onAppear:
+            if case .loading = state.view {
+                state.view = .loaded(.init())
+            }
             return .fireAndForget {
                 await environment.analytics.track(event: "login_viewed", metadata: [:])
             }
 
         case let .emailChanged(email):
-            state.form.email = email
-            state.form.errorMessage = nil
+            state.updateForm { form in
+                form.email = email
+            }
             return .none
 
         case let .passwordChanged(password):
-            state.form.password = password
-            state.form.errorMessage = nil
+            state.updateForm { form in
+                form.password = password
+            }
             return .none
 
         case .toggleSecureEntry:
-            state.form.isSecureEntry.toggle()
+            state.updateForm { form in
+                form.isSecureEntry.toggle()
+            }
             return .none
 
         case .submit:
-            guard !state.isLoading else { return .none }
+            let loadedState = state.currentLoadedState()
 
-            guard state.form.email.isValidEmail else {
-                state.form.errorMessage = "Please enter a valid email."
+            guard loadedState.form.email.isValidEmail else {
+                state.view = .error(.init(form: loadedState.form, message: "Please enter a valid email."))
                 return .none
             }
 
-            guard state.form.password.count >= 4 else {
-                state.form.errorMessage = "Your password should be at least 4 characters."
+            guard loadedState.form.password.count >= 4 else {
+                state.view = .error(.init(form: loadedState.form, message: "Your password should be at least 4 characters."))
                 return .none
             }
 
-            state.isLoading = true
-            state.form.errorMessage = nil
-
-            let email = state.form.email
-            let password = state.form.password
+            state.view = .submitting(loadedState)
+            let email = loadedState.form.email
+            let password = loadedState.form.password
 
             return .task {
                 do {
@@ -140,40 +163,45 @@ enum LoginDomain {
             }
 
         case let .loginResponse(result):
-            state.isLoading = false
             switch result {
             case let .success(session):
-                state.session = session
-                state.isAuthenticated = true
+                state.view = .authenticated(session)
                 return .send(.delegate(.authenticated(session)))
 
             case let .failure(error):
-                state.form.errorMessage = error.message
-                state.isAuthenticated = false
-            }
-            return .none
-
-        case .forgotPasswordTapped:
-            state.route = .forgotPassword
-            return .none
-
-        case let .forgotEmailChanged(email):
-            state.forgot.email = email
-            state.forgot.status = .idle
-            return .none
-
-        case .sendReset:
-            guard !state.isLoading else { return .none }
-
-            guard state.forgot.email.isValidEmail else {
-                state.forgot.status = .failure(message: "Please enter a valid email address.")
+                let loadedState = state.currentLoadedState()
+                state.view = .error(.init(form: loadedState.form, message: error.message))
                 return .none
             }
 
-            state.isLoading = true
-            state.forgot.status = .idle
+        case .forgotPasswordTapped:
+            let resume = state.currentLoadedState()
+            var forgotState = ForgotPasswordState()
+            forgotState.email = resume.form.email
+            forgotState.resume = resume
+            state.view = .forgotPassword(forgotState)
+            return .none
 
-            let email = state.forgot.email
+        case let .forgotEmailChanged(email):
+            guard case var .forgotPassword(forgotState) = state.view else { return .none }
+            forgotState.email = email
+            forgotState.status = .idle
+            state.view = .forgotPassword(forgotState)
+            return .none
+
+        case .sendReset:
+            guard case var .forgotPassword(forgotState) = state.view else { return .none }
+
+            guard forgotState.email.isValidEmail else {
+                forgotState.status = .failure(message: "Please enter a valid email address.")
+                state.view = .forgotPassword(forgotState)
+                return .none
+            }
+
+            forgotState.status = .sending
+            state.view = .forgotPassword(forgotState)
+
+            let email = forgotState.email
 
             return .task {
                 do {
@@ -187,26 +215,68 @@ enum LoginDomain {
             }
 
         case let .resetResponse(result):
-            state.isLoading = false
+            guard case var .forgotPassword(forgotState) = state.view else { return .none }
+
             switch result {
             case .success:
-                state.forgot.status = .success(message: "We sent a magic link to \(state.forgot.email).")
+                forgotState.status = .success(message: "We sent a magic link to \(forgotState.email).")
             case let .failure(error):
-                state.forgot.status = .failure(message: error.message)
+                forgotState.status = .failure(message: error.message)
             }
+
+            state.view = .forgotPassword(forgotState)
             return .none
 
         case .dismissForgot:
-            state.route = nil
-            state.forgot = .init()
+            guard case let .forgotPassword(forgotState) = state.view else { return .none }
+            state.view = .loaded(forgotState.resume)
             return .none
 
         case .clearError:
-            state.form.errorMessage = nil
+            guard case let .error(errorState) = state.view else { return .none }
+            state.view = .loaded(.init(form: errorState.form))
             return .none
 
         case .delegate:
             return .none
+        }
+    }
+}
+
+private extension LoginDomain.State {
+    mutating func updateForm(_ update: (inout LoginDomain.LoginForm) -> Void) {
+        switch view {
+        case var .loaded(loadedState):
+            update(&loadedState.form)
+            view = .loaded(loadedState)
+        case var .submitting(loadedState):
+            update(&loadedState.form)
+            view = .submitting(loadedState)
+        case var .error(errorState):
+            update(&errorState.form)
+            view = .loaded(.init(form: errorState.form))
+        case var .forgotPassword(forgotState):
+            update(&forgotState.resume.form)
+            view = .forgotPassword(forgotState)
+        case .loading:
+            var form = LoginDomain.LoginForm()
+            update(&form)
+            view = .loaded(.init(form: form))
+        case .authenticated:
+            break
+        }
+    }
+
+    func currentLoadedState() -> LoginDomain.LoadedState {
+        switch view {
+        case let .loaded(loadedState), let .submitting(loadedState):
+            return loadedState
+        case let .error(errorState):
+            return .init(form: errorState.form)
+        case let .forgotPassword(forgotState):
+            return forgotState.resume
+        case .authenticated, .loading:
+            return .init()
         }
     }
 }

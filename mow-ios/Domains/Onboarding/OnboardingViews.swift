@@ -24,6 +24,46 @@ private struct OnboardingFlowView: View {
     }
 
     var body: some View {
+        content
+            .padding(24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+            .overlay {
+                if store.state.shouldShowCompletionOverlay {
+                    BusyOverlay(text: "Setting things up…")
+                }
+            }
+            .task {
+                store.send(.onAppear)
+            }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch store.state {
+        case .loading:
+            ProgressView("Loading…")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        case let .error(errorState):
+            VStack(spacing: 16) {
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.largeTitle)
+                    .foregroundStyle(.orange)
+                Text(errorState.message)
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                Button("Try again") {
+                    store.send(.onAppear)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        case .loaded:
+            loadedContent
+        }
+    }
+
+    private var loadedContent: some View {
         VStack(spacing: 24) {
             TabView(selection: selection) {
                 ForEach(store.state.steps) { step in
@@ -39,23 +79,12 @@ private struct OnboardingFlowView: View {
 
             OnboardingActionBar(
                 canGoBack: store.state.currentIndex > 0,
-                isFinalStep: store.state.currentIndex == store.state.steps.count - 1,
-                isBusy: store.state.isLoading,
+                isFinalStep: store.state.isOnFinalStep,
+                isBusy: store.state.shouldShowCompletionOverlay,
                 onBack: { store.send(.back) },
                 onPrimary: { store.send(.advance) },
                 onSkip: { store.send(.skip) }
             )
-        }
-        .padding(24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
-        .overlay {
-            if store.state.isLoading {
-                BusyOverlay(text: "Setting things up…")
-            }
-        }
-        .task {
-            store.send(.onAppear)
         }
     }
 }
@@ -144,6 +173,32 @@ private struct OnboardingActionBar: View {
             .buttonStyle(.borderedProminent)
             .disabled(isBusy)
         }
+    }
+}
+
+private extension OnboardingDomain.State {
+    var loadedState: LoadedState? {
+        if case let .loaded(loadedState) = self {
+            return loadedState
+        }
+        return nil
+    }
+
+    var steps: [OnboardingDomain.Step] {
+        loadedState?.steps ?? []
+    }
+
+    var currentIndex: Int {
+        loadedState?.currentIndex ?? 0
+    }
+
+    var shouldShowCompletionOverlay: Bool {
+        loadedState?.isCompleting ?? false
+    }
+
+    var isOnFinalStep: Bool {
+        guard let loadedState else { return false }
+        return loadedState.steps.indices.last == loadedState.currentIndex
     }
 }
 

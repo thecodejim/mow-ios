@@ -1,25 +1,23 @@
 import SwiftUI
 
+private enum Route: Hashable {
+    case forgotPassword
+}
+
 struct LoginCoordinatorView: View {
     @ObservedObject var store: LoginScopedStore
 
-    private var pathBinding: Binding<[LoginDomain.Route]> {
+    private var pathBinding: Binding<[Route]> {
         Binding(
-            get: {
-                guard let route = store.state.route else { return [] }
-                return [route]
-            },
+            get: { store.state.isShowingForgot ? [.forgotPassword] : [] },
             set: { newValue in
                 if newValue.isEmpty {
-                    if store.state.route != nil {
+                    if store.state.isShowingForgot {
                         store.send(.dismissForgot)
                     }
-                } else if let destination = newValue.last {
-                    switch destination {
-                    case .forgotPassword:
-                        if store.state.route == nil {
-                            store.send(.forgotPasswordTapped)
-                        }
+                } else if let destination = newValue.last, destination == .forgotPassword {
+                    if !store.state.isShowingForgot {
+                        store.send(.forgotPasswordTapped)
                     }
                 }
             }
@@ -29,7 +27,7 @@ struct LoginCoordinatorView: View {
     var body: some View {
         NavigationStack(path: pathBinding) {
             LoginScreen(store: store)
-                .navigationDestination(for: LoginDomain.Route.self) { route in
+                .navigationDestination(for: Route.self) { route in
                     switch route {
                     case .forgotPassword:
                         ForgotPasswordView(store: store)
@@ -54,7 +52,7 @@ private struct LoginScreen: View {
 
             VStack(spacing: 18) {
                 TextField("Email", text: Binding(
-                    get: { store.state.form.email },
+                    get: { store.state.loginForm.email },
                     set: { store.send(.emailChanged($0)) }
                 ))
                 .textContentType(.emailAddress)
@@ -64,21 +62,21 @@ private struct LoginScreen: View {
                 .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
 
                 ZStack(alignment: .trailing) {
-                    if store.state.form.isSecureEntry {
+                    if store.state.loginForm.isSecureEntry {
                         SecureField("Password", text: Binding(
-                            get: { store.state.form.password },
+                            get: { store.state.loginForm.password },
                             set: { store.send(.passwordChanged($0)) }
                         ))
                         .textContentType(.password)
                     } else {
                         TextField("Password", text: Binding(
-                            get: { store.state.form.password },
+                            get: { store.state.loginForm.password },
                             set: { store.send(.passwordChanged($0)) }
                         ))
                         .textContentType(.password)
                     }
 
-                    Button(store.state.form.isSecureEntry ? "Show" : "Hide") {
+                    Button(store.state.loginForm.isSecureEntry ? "Show" : "Hide") {
                         store.send(.toggleSecureEntry)
                     }
                     .font(.caption.bold())
@@ -87,7 +85,7 @@ private struct LoginScreen: View {
                 .padding()
                 .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
 
-                if let error = store.state.form.errorMessage {
+                if let error = store.state.errorMessage {
                     Label(error, systemImage: "exclamationmark.triangle.fill")
                         .font(.footnote)
                         .foregroundStyle(.orange)
@@ -112,7 +110,7 @@ private struct LoginScreen: View {
                 .padding()
             }
             .buttonStyle(.borderedProminent)
-            .disabled(store.state.isLoading)
+            .disabled(store.state.isSubmitting)
 
             Spacer()
         }
@@ -120,7 +118,7 @@ private struct LoginScreen: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .overlay {
-            if store.state.isLoading {
+            if store.state.isSubmitting {
                 BusyOverlay(text: "Checking your credentials…")
             }
         }
@@ -134,10 +132,11 @@ private struct ForgotPasswordView: View {
     @ObservedObject var store: LoginScopedStore
 
     var body: some View {
+        let forgotState = store.state.forgotState
         Form {
             Section("Email") {
                 TextField("name@email.com", text: Binding(
-                    get: { store.state.forgot.email },
+                    get: { forgotState.email },
                     set: { store.send(.forgotEmailChanged($0)) }
                 ))
                 .textContentType(.emailAddress)
@@ -148,10 +147,10 @@ private struct ForgotPasswordView: View {
                 Button("Send reset link") {
                     store.send(.sendReset)
                 }
-                .disabled(store.state.isLoading)
+                .disabled(store.state.isSendingReset)
             }
 
-            if case let .success(message) = store.state.forgot.status {
+            if case let .success(message) = forgotState.status {
                 Section {
                     Label(message, systemImage: "envelope.badge")
                         .foregroundStyle(.green)
@@ -159,7 +158,7 @@ private struct ForgotPasswordView: View {
                 }
             }
 
-            if case let .failure(message) = store.state.forgot.status {
+            if case let .failure(message) = forgotState.status {
                 Section {
                     Label(message, systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
@@ -170,7 +169,7 @@ private struct ForgotPasswordView: View {
         .navigationTitle("Forgot password")
         .navigationBarTitleDisplayMode(.inline)
         .overlay {
-            if store.state.isLoading {
+            if store.state.isSendingReset {
                 BusyOverlay(text: "Sending instructions…")
             }
         }
@@ -210,4 +209,54 @@ private struct ForgotPasswordView: View {
         action: AppDomain.Action.login
     )
     return LoginCoordinatorView(store: scopedStore)
+}
+
+private extension LoginDomain.State {
+    var loginForm: LoginDomain.LoginForm {
+        switch view {
+        case let .loaded(loadedState), let .submitting(loadedState):
+            return loadedState.form
+        case let .error(errorState):
+            return errorState.form
+        case let .forgotPassword(forgotState):
+            return forgotState.resume.form
+        case .loading, .authenticated:
+            return .init()
+        }
+    }
+
+    var errorMessage: String? {
+        if case let .error(errorState) = view {
+            return errorState.message
+        }
+        return nil
+    }
+
+    var isSubmitting: Bool {
+        if case .submitting = view {
+            return true
+        }
+        return false
+    }
+
+    var isShowingForgot: Bool {
+        if case .forgotPassword = view {
+            return true
+        }
+        return false
+    }
+
+    var forgotState: LoginDomain.ForgotPasswordState {
+        if case let .forgotPassword(forgotState) = view {
+            return forgotState
+        }
+        return .init()
+    }
+
+    var isSendingReset: Bool {
+        if case let .forgotPassword(forgotState) = view, forgotState.status == .sending {
+            return true
+        }
+        return false
+    }
 }
