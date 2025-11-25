@@ -155,7 +155,13 @@ private struct OnboardingActionBar: View {
         login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics),
         home: .init(api: dependencies.api)
     )
-    let appStore = Store(initialState: AppDomain.State(route: .onboarding(.init())), environment: environment, reducer: AppDomain.reducer)
+    let appStore = Store(
+        initialState: AppDomain.State(route: .onboarding(.init())),
+        environment: environment,
+        reducer: { state, action, environment in
+            AppDomain.reducer(state: &state, action: action, environment: environment)
+        }
+    )
     let scopedStore = appStore.scope(
         state: { state in
             if case let .onboarding(onboardingState) = state.route {

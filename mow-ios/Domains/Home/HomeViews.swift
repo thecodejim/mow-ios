@@ -198,7 +198,13 @@ private struct ProfileView: View {
         home: .init(api: dependencies.api)
     )
     let state = AppDomain.State(route: .home(.init()))
-    let appStore = Store(initialState: state, environment: environment, reducer: AppDomain.reducer)
+    let appStore = Store(
+        initialState: state,
+        environment: environment,
+        reducer: { state, action, environment in
+            AppDomain.reducer(state: &state, action: action, environment: environment)
+        }
+    )
     let scopedStore = appStore.scope(
         state: { state in
             if case let .home(childState) = state.route {

@@ -193,7 +193,13 @@ private struct ForgotPasswordView: View {
         home: .init(api: dependencies.api)
     )
     let state = AppDomain.State(route: .login(.init()))
-    let appStore = Store(initialState: state, environment: environment, reducer: AppDomain.reducer)
+    let appStore = Store(
+        initialState: state,
+        environment: environment,
+        reducer: { state, action, environment in
+            AppDomain.reducer(state: &state, action: action, environment: environment)
+        }
+    )
     let scopedStore = appStore.scope(
         state: { state in
             if case let .login(childState) = state.route {
