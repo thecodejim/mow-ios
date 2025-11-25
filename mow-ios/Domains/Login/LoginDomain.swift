@@ -1,21 +1,17 @@
 import Foundation
 
 enum LoginDomain {
-    struct State: Equatable, Sendable {
-        var view: ViewState
-
-        init(view: ViewState = .loaded(.init())) {
-            self.view = view
-        }
-    }
-
-    enum ViewState: Equatable, Sendable {
+    enum State: Equatable, Sendable {
         case loading
         case loaded(LoadedState)
         case submitting(LoadedState)
         case forgotPassword(ForgotPasswordState)
         case authenticated(AuthSession)
         case error(ErrorState)
+
+        init() {
+            self = .loaded(.init())
+        }
     }
 
     struct LoadedState: Equatable, Sendable {
@@ -107,8 +103,8 @@ enum LoginDomain {
     static func reducer(state: inout State, action: Action, environment: Environment) -> Effect<Action> {
         switch action {
         case .onAppear:
-            if case .loading = state.view {
-                state.view = .loaded(.init())
+            if case .loading = state {
+                state = .loaded(.init())
             }
             return .fireAndForget {
                 await environment.analytics.track(event: "login_viewed", metadata: [:])
@@ -136,16 +132,16 @@ enum LoginDomain {
             let loadedState = state.currentLoadedState()
 
             guard loadedState.form.email.isValidEmail else {
-                state.view = .error(.init(form: loadedState.form, message: "Please enter a valid email."))
+                state = .error(.init(form: loadedState.form, message: "Please enter a valid email."))
                 return .none
             }
 
             guard loadedState.form.password.count >= 4 else {
-                state.view = .error(.init(form: loadedState.form, message: "Your password should be at least 4 characters."))
+                state = .error(.init(form: loadedState.form, message: "Your password should be at least 4 characters."))
                 return .none
             }
 
-            state.view = .submitting(loadedState)
+            state = .submitting(loadedState)
             let email = loadedState.form.email
             let password = loadedState.form.password
 
@@ -165,12 +161,12 @@ enum LoginDomain {
         case let .loginResponse(result):
             switch result {
             case let .success(session):
-                state.view = .authenticated(session)
+                state = .authenticated(session)
                 return .send(.delegate(.authenticated(session)))
 
             case let .failure(error):
                 let loadedState = state.currentLoadedState()
-                state.view = .error(.init(form: loadedState.form, message: error.message))
+                state = .error(.init(form: loadedState.form, message: error.message))
                 return .none
             }
 
@@ -179,27 +175,27 @@ enum LoginDomain {
             var forgotState = ForgotPasswordState()
             forgotState.email = resume.form.email
             forgotState.resume = resume
-            state.view = .forgotPassword(forgotState)
+            state = .forgotPassword(forgotState)
             return .none
 
         case let .forgotEmailChanged(email):
-            guard case var .forgotPassword(forgotState) = state.view else { return .none }
+            guard case var .forgotPassword(forgotState) = state else { return .none }
             forgotState.email = email
             forgotState.status = .idle
-            state.view = .forgotPassword(forgotState)
+            state = .forgotPassword(forgotState)
             return .none
 
         case .sendReset:
-            guard case var .forgotPassword(forgotState) = state.view else { return .none }
+            guard case var .forgotPassword(forgotState) = state else { return .none }
 
             guard forgotState.email.isValidEmail else {
                 forgotState.status = .failure(message: "Please enter a valid email address.")
-                state.view = .forgotPassword(forgotState)
+                state = .forgotPassword(forgotState)
                 return .none
             }
 
             forgotState.status = .sending
-            state.view = .forgotPassword(forgotState)
+            state = .forgotPassword(forgotState)
 
             let email = forgotState.email
 
@@ -215,7 +211,7 @@ enum LoginDomain {
             }
 
         case let .resetResponse(result):
-            guard case var .forgotPassword(forgotState) = state.view else { return .none }
+            guard case var .forgotPassword(forgotState) = state else { return .none }
 
             switch result {
             case .success:
@@ -224,17 +220,17 @@ enum LoginDomain {
                 forgotState.status = .failure(message: error.message)
             }
 
-            state.view = .forgotPassword(forgotState)
+            state = .forgotPassword(forgotState)
             return .none
 
         case .dismissForgot:
-            guard case let .forgotPassword(forgotState) = state.view else { return .none }
-            state.view = .loaded(forgotState.resume)
+            guard case let .forgotPassword(forgotState) = state else { return .none }
+            state = .loaded(forgotState.resume)
             return .none
 
         case .clearError:
-            guard case let .error(errorState) = state.view else { return .none }
-            state.view = .loaded(.init(form: errorState.form))
+            guard case let .error(errorState) = state else { return .none }
+            state = .loaded(.init(form: errorState.form))
             return .none
 
         case .delegate:
@@ -245,30 +241,30 @@ enum LoginDomain {
 
 private extension LoginDomain.State {
     mutating func updateForm(_ update: (inout LoginDomain.LoginForm) -> Void) {
-        switch view {
+        switch self {
         case var .loaded(loadedState):
             update(&loadedState.form)
-            view = .loaded(loadedState)
+            self = .loaded(loadedState)
         case var .submitting(loadedState):
             update(&loadedState.form)
-            view = .submitting(loadedState)
+            self = .submitting(loadedState)
         case var .error(errorState):
             update(&errorState.form)
-            view = .loaded(.init(form: errorState.form))
+            self = .loaded(.init(form: errorState.form))
         case var .forgotPassword(forgotState):
             update(&forgotState.resume.form)
-            view = .forgotPassword(forgotState)
+            self = .forgotPassword(forgotState)
         case .loading:
             var form = LoginDomain.LoginForm()
             update(&form)
-            view = .loaded(.init(form: form))
+            self = .loaded(.init(form: form))
         case .authenticated:
             break
         }
     }
 
     func currentLoadedState() -> LoginDomain.LoadedState {
-        switch view {
+        switch self {
         case let .loaded(loadedState), let .submitting(loadedState):
             return loadedState
         case let .error(errorState):

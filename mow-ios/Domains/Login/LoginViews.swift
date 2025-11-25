@@ -213,7 +213,7 @@ private struct ForgotPasswordView: View {
 
 private extension LoginDomain.State {
     var loginForm: LoginDomain.LoginForm {
-        switch view {
+        switch self {
         case let .loaded(loadedState), let .submitting(loadedState):
             return loadedState.form
         case let .error(errorState):
@@ -226,35 +226,35 @@ private extension LoginDomain.State {
     }
 
     var errorMessage: String? {
-        if case let .error(errorState) = view {
+        if case let .error(errorState) = self {
             return errorState.message
         }
         return nil
     }
 
     var isSubmitting: Bool {
-        if case .submitting = view {
+        if case .submitting = self {
             return true
         }
         return false
     }
 
     var isShowingForgot: Bool {
-        if case .forgotPassword = view {
+        if case .forgotPassword = self {
             return true
         }
         return false
     }
 
     var forgotState: LoginDomain.ForgotPasswordState {
-        if case let .forgotPassword(forgotState) = view {
+        if case let .forgotPassword(forgotState) = self {
             return forgotState
         }
         return .init()
     }
 
     var isSendingReset: Bool {
-        if case let .forgotPassword(forgotState) = view, forgotState.status == .sending {
+        if case let .forgotPassword(forgotState) = self, forgotState.status == .sending {
             return true
         }
         return false
