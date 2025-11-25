@@ -4,7 +4,7 @@ import Combine
 final class AppCoordinator: ObservableObject {
     let store: Store<AppDomain.State, AppDomain.Action, AppDomain.Environment>
 
-    @Published private(set) var route: AppDomain.Route
+    @Published private(set) var route: AppDomain.State.Route
 
     let onboardingStore: OnboardingScopedStore
     let loginStore: LoginScopedStore

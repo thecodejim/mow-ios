@@ -7,11 +7,11 @@ struct AppRootView: View {
         Group {
             switch coordinator.route {
             case .onboarding:
-                OnboardingCoordinatorView(store: coordinator.onboardingStore)
+                OnboardingRootView(store: coordinator.onboardingStore)
             case .login:
-                LoginCoordinatorView(store: coordinator.loginStore)
+                LoginRootView(store: coordinator.loginStore)
             case .home:
-                HomeCoordinatorView(store: coordinator.homeStore)
+                HomeRootView(store: coordinator.homeStore)
             }
         }
         .animation(.easeInOut, value: coordinator.route)

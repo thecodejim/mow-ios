@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct OnboardingCoordinatorView: View {
+struct OnboardingRootView: View {
     @ObservedObject var store: OnboardingScopedStore
 
     var body: some View {
@@ -90,7 +90,7 @@ private struct OnboardingFlowView: View {
 }
 
 private struct OnboardingStepCard: View {
-    let step: OnboardingDomain.Step
+    let step: OnboardingDomain.State.Step
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -129,7 +129,7 @@ private struct OnboardingStepCard: View {
 }
 
 private struct OnboardingPagerIndicator: View {
-    let steps: [OnboardingDomain.Step]
+    let steps: [OnboardingDomain.State.Step]
     let current: Int
 
     var body: some View {
@@ -186,7 +186,7 @@ private extension OnboardingDomain.State {
         return nil
     }
 
-    var steps: [OnboardingDomain.Step] {
+    var steps: [OnboardingDomain.State.Step] {
         loadedState?.steps ?? []
     }
 
@@ -228,5 +228,5 @@ private extension OnboardingDomain.State {
         },
         action: AppDomain.Action.onboarding
     )
-    return OnboardingCoordinatorView(store: scopedStore)
+    return OnboardingRootView(store: scopedStore)
 }

@@ -9,13 +9,13 @@ enum AppDomain {
     }
 
     struct State: Equatable, Sendable {
+        enum Route: Equatable, Sendable {
+            case onboarding(OnboardingDomain.State)
+            case login(LoginDomain.State)
+            case home(HomeDomain.State)
+        }
+        
         var route: Route = .onboarding(.init())
-    }
-
-    enum Route: Equatable, Sendable {
-        case onboarding(OnboardingDomain.State)
-        case login(LoginDomain.State)
-        case home(HomeDomain.State)
     }
 
     enum Action: Equatable, Sendable {

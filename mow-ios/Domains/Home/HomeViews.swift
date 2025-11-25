@@ -1,14 +1,6 @@
 import SwiftUI
 
-struct HomeCoordinatorView: View {
-    @ObservedObject var store: HomeScopedStore
-
-    var body: some View {
-        HomeTabView(store: store)
-    }
-}
-
-private struct HomeTabView: View {
+struct HomeRootView: View {
     @ObservedObject var store: HomeScopedStore
 
     private var selection: Binding<HomeDomain.Tab> {
@@ -220,6 +212,28 @@ private struct ProfileView: View {
     }
 }
 
+private extension HomeDomain.State {
+    var currentTab: HomeDomain.Tab {
+        switch self {
+        case let .loaded(state), let .refreshing(state):
+            return state.selectedTab
+        case let .error(errorState):
+            return errorState.previousState?.selectedTab ?? .dashboard
+        case .loading:
+            return .dashboard
+        }
+    }
+
+    var alertMessage: String? {
+        switch self {
+        case let .loaded(state), let .refreshing(state):
+            return state.alertMessage
+        default:
+            return nil
+        }
+    }
+}
+
 #Preview {
     let dependencies = AppDependencies.live()
     let environment = AppDomain.Environment(
@@ -245,27 +259,5 @@ private struct ProfileView: View {
         },
         action: AppDomain.Action.home
     )
-    return HomeCoordinatorView(store: scopedStore)
-}
-
-private extension HomeDomain.State {
-    var currentTab: HomeDomain.Tab {
-        switch self {
-        case let .loaded(state), let .refreshing(state):
-            return state.selectedTab
-        case let .error(errorState):
-            return errorState.previousState?.selectedTab ?? .dashboard
-        case .loading:
-            return .dashboard
-        }
-    }
-
-    var alertMessage: String? {
-        switch self {
-        case let .loaded(state), let .refreshing(state):
-            return state.alertMessage
-        default:
-            return nil
-        }
-    }
+    return HomeRootView(store: scopedStore)
 }

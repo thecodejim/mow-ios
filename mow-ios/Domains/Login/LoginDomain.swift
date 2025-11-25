@@ -15,42 +15,52 @@ enum LoginDomain {
         case forgotPassword(ForgotPasswordState)
         case authenticated(AuthSession)
         case error(ErrorState)
-    }
+        
+        struct LoadedState: Equatable, Sendable {
+            var form: LoginForm
 
-    struct LoadedState: Equatable, Sendable {
-        var form: LoginForm
-
-        init(form: LoginForm = .init()) {
-            self.form = form
+            init(form: LoginForm = .init()) {
+                self.form = form
+            }
         }
-    }
+        
+        struct ForgotPasswordState: Equatable, Sendable {
+            enum Status: Equatable, Sendable {
+                case idle
+                case sending
+                case success(message: String)
+                case failure(message: String)
+            }
 
-    struct ErrorState: Equatable, Sendable {
-        var form: LoginForm
-        var message: String
-    }
-
-    struct LoginForm: Equatable, Sendable {
-        var email = "volunteer@example.com"
-        var password = "password"
-        var isSecureEntry = true
-
-        var isValid: Bool {
-            email.isValidEmail && password.count >= 4
-        }
-    }
-
-    struct ForgotPasswordState: Equatable, Sendable {
-        enum Status: Equatable, Sendable {
-            case idle
-            case sending
-            case success(message: String)
-            case failure(message: String)
+            var email = ""
+            var status: Status = .idle
+            var resume: LoadedState = .init()
         }
 
-        var email = ""
-        var status: Status = .idle
-        var resume: LoadedState = .init()
+        struct ErrorState: Equatable, Sendable {
+            var form: LoginForm
+            var message: String
+        }
+
+        struct LoginForm: Equatable, Sendable {
+            var email = "volunteer@example.com"
+            var password = "password"
+            var isSecureEntry = true
+
+            var isValid: Bool {
+                email.isValidEmail && password.count >= 4
+            }
+        }
+        
+        enum LoginResponse: Equatable, Sendable {
+            case success(AuthSession)
+            case failure(DomainError)
+        }
+
+        enum ResetResponse: Equatable, Sendable {
+            case success
+            case failure(DomainError)
+        }
     }
 
     enum DomainError: Error, Equatable, Sendable {
@@ -65,16 +75,6 @@ enum LoginDomain {
         }
     }
 
-    enum LoginResponse: Equatable, Sendable {
-        case success(AuthSession)
-        case failure(DomainError)
-    }
-
-    enum ResetResponse: Equatable, Sendable {
-        case success
-        case failure(DomainError)
-    }
-
     enum DelegateAction: Equatable, Sendable {
         case authenticated(AuthSession)
         case logout
@@ -86,11 +86,11 @@ enum LoginDomain {
         case passwordChanged(String)
         case toggleSecureEntry
         case submit
-        case loginResponse(LoginResponse)
+        case loginResponse(State.LoginResponse)
         case forgotPasswordTapped
         case forgotEmailChanged(String)
         case sendReset
-        case resetResponse(ResetResponse)
+        case resetResponse(State.ResetResponse)
         case dismissForgot
         case clearError
         case delegate(DelegateAction)
@@ -168,7 +168,7 @@ enum LoginDomain {
 
         case .forgotPasswordTapped:
             let resume = state.currentLoadedState()
-            var forgotState = ForgotPasswordState()
+            var forgotState = State.ForgotPasswordState()
             forgotState.email = resume.form.email
             forgotState.resume = resume
             state = .forgotPassword(forgotState)
@@ -236,7 +236,7 @@ enum LoginDomain {
 }
 
 private extension LoginDomain.State {
-    mutating func updateForm(_ update: (inout LoginDomain.LoginForm) -> Void) {
+    mutating func updateForm(_ update: (inout LoginDomain.State.LoginForm) -> Void) {
         switch self {
         case var .loaded(loadedState):
             update(&loadedState.form)
@@ -251,7 +251,7 @@ private extension LoginDomain.State {
             update(&forgotState.resume.form)
             self = .forgotPassword(forgotState)
         case .loading:
-            var form = LoginDomain.LoginForm()
+            var form = LoginDomain.State.LoginForm()
             update(&form)
             self = .loaded(.init(form: form))
         case .authenticated:
@@ -259,7 +259,7 @@ private extension LoginDomain.State {
         }
     }
 
-    func currentLoadedState() -> LoginDomain.LoadedState {
+    func currentLoadedState() -> LoginDomain.State.LoadedState {
         switch self {
         case let .loaded(loadedState), let .submitting(loadedState):
             return loadedState

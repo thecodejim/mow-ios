@@ -4,7 +4,7 @@ private enum Route: Hashable {
     case forgotPassword
 }
 
-struct LoginCoordinatorView: View {
+struct LoginRootView: View {
     @ObservedObject var store: LoginScopedStore
 
     private var pathBinding: Binding<[Route]> {
@@ -176,36 +176,8 @@ private struct ForgotPasswordView: View {
     }
 }
 
-#Preview {
-    let dependencies = AppDependencies.live()
-    let environment = AppDomain.Environment(
-        appEnvironment: dependencies.environment,
-        onboarding: .init(appEnvironment: dependencies.environment, analytics: dependencies.analytics),
-        login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics),
-        home: .init(api: dependencies.api)
-    )
-    let state = AppDomain.State(route: .login(.init()))
-    let appStore = Store(
-        initialState: state,
-        environment: environment,
-        reducer: { state, action, environment in
-            AppDomain.reducer(state: &state, action: action, environment: environment)
-        }
-    )
-    let scopedStore = appStore.scope(
-        state: { state in
-            if case let .login(childState) = state.route {
-                return childState
-            }
-            return .init()
-        },
-        action: AppDomain.Action.login
-    )
-    return LoginCoordinatorView(store: scopedStore)
-}
-
 private extension LoginDomain.State {
-    var loginForm: LoginDomain.LoginForm {
+    var loginForm: LoginDomain.State.LoginForm {
         switch self {
         case let .loaded(loadedState), let .submitting(loadedState):
             return loadedState.form
@@ -239,7 +211,7 @@ private extension LoginDomain.State {
         return false
     }
 
-    var forgotState: LoginDomain.ForgotPasswordState {
+    var forgotState: LoginDomain.State.ForgotPasswordState {
         if case let .forgotPassword(forgotState) = self {
             return forgotState
         }
@@ -252,4 +224,32 @@ private extension LoginDomain.State {
         }
         return false
     }
+}
+
+#Preview {
+    let dependencies = AppDependencies.live()
+    let environment = AppDomain.Environment(
+        appEnvironment: dependencies.environment,
+        onboarding: .init(appEnvironment: dependencies.environment, analytics: dependencies.analytics),
+        login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics),
+        home: .init(api: dependencies.api)
+    )
+    let state = AppDomain.State(route: .login(.init()))
+    let appStore = Store(
+        initialState: state,
+        environment: environment,
+        reducer: { state, action, environment in
+            AppDomain.reducer(state: &state, action: action, environment: environment)
+        }
+    )
+    let scopedStore = appStore.scope(
+        state: { state in
+            if case let .login(childState) = state.route {
+                return childState
+            }
+            return .init()
+        },
+        action: AppDomain.Action.login
+    )
+    return LoginRootView(store: scopedStore)
 }
