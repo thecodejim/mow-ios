@@ -155,11 +155,13 @@ private struct OnboardingActionBar: View {
 
     var body: some View {
         HStack(spacing: 16) {
-            Button("Skip") {
-                onSkip()
+            if !isFinalStep {
+                Button("Skip") {
+                    onSkip()
+                }
+                .buttonStyle(.borderless)
+                .disabled(isBusy)
             }
-            .buttonStyle(.borderless)
-            .disabled(isBusy)
 
             Button("Back") {
                 onBack()
