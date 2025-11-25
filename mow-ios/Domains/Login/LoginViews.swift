@@ -173,13 +173,6 @@ private struct ForgotPasswordView: View {
                 BusyOverlay(text: "Sending instructions…")
             }
         }
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Close") {
-                    store.send(.dismissForgot)
-                }
-            }
-        }
     }
 }
 
