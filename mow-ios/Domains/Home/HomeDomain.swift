@@ -1,6 +1,10 @@
 import Foundation
 
 enum HomeDomain {
+    struct Environment: @unchecked Sendable {
+        let api: any APIService
+    }
+
     enum Tab: String, CaseIterable, Identifiable, Sendable {
         case dashboard
         case meals
@@ -87,10 +91,6 @@ enum HomeDomain {
             var role = ""
             var territory = ""
         }
-    }
-
-    struct Environment: @unchecked Sendable {
-        let api: any APIService
     }
 
     enum DelegateAction: Equatable, Sendable {

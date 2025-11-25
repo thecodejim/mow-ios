@@ -11,7 +11,7 @@ struct MowApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AppCoordinatorView(coordinator: coordinator)
+            AppRootView(coordinator: coordinator)
         }
     }
 }

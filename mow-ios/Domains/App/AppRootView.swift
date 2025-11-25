@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AppCoordinatorView: View {
+struct AppRootView: View {
     @ObservedObject var coordinator: AppCoordinator
 
     var body: some View {

@@ -1,6 +1,13 @@
 import Foundation
 
 enum LoginDomain {
+    struct Environment: @unchecked Sendable {
+        let appEnvironment: AppEnvironment
+        let api: any APIService
+        let keychain: any KeychainService
+        let analytics: any AnalyticsService
+    }
+
     enum State: Equatable, Sendable {
         case loading
         case loaded(LoadedState)
@@ -8,10 +15,6 @@ enum LoginDomain {
         case forgotPassword(ForgotPasswordState)
         case authenticated(AuthSession)
         case error(ErrorState)
-
-        init() {
-            self = .loaded(.init())
-        }
     }
 
     struct LoadedState: Equatable, Sendable {
@@ -48,13 +51,6 @@ enum LoginDomain {
         var email = ""
         var status: Status = .idle
         var resume: LoadedState = .init()
-    }
-
-    struct Environment: @unchecked Sendable {
-        let appEnvironment: AppEnvironment
-        let api: any APIService
-        let keychain: any KeychainService
-        let analytics: any AnalyticsService
     }
 
     enum DomainError: Error, Equatable, Sendable {
@@ -281,5 +277,11 @@ private extension String {
     var isValidEmail: Bool {
         let pattern = #"^\S+@\S+\.\S+$"#
         return range(of: pattern, options: .regularExpression) != nil
+    }
+}
+
+extension LoginDomain.State {
+    init() {
+        self = .loaded(.init())
     }
 }

@@ -1,6 +1,13 @@
 import Foundation
 
 enum AppDomain {
+    struct Environment: @unchecked Sendable {
+        let appEnvironment: AppEnvironment
+        let onboarding: OnboardingDomain.Environment
+        let login: LoginDomain.Environment
+        let home: HomeDomain.Environment
+    }
+
     struct State: Equatable, Sendable {
         var route: Route = .onboarding(.init())
     }
@@ -9,13 +16,6 @@ enum AppDomain {
         case onboarding(OnboardingDomain.State)
         case login(LoginDomain.State)
         case home(HomeDomain.State)
-    }
-
-    struct Environment: @unchecked Sendable {
-        let appEnvironment: AppEnvironment
-        let onboarding: OnboardingDomain.Environment
-        let login: LoginDomain.Environment
-        let home: HomeDomain.Environment
     }
 
     enum Action: Equatable, Sendable {

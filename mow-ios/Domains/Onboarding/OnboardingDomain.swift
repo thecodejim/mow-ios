@@ -1,6 +1,11 @@
 import Foundation
 
 enum OnboardingDomain {
+    struct Environment: @unchecked Sendable {
+        let appEnvironment: AppEnvironment
+        let analytics: any AnalyticsService
+    }
+
     enum State: Equatable, Sendable {
         case loading
         case loaded(LoadedState)
@@ -15,11 +20,6 @@ enum OnboardingDomain {
         struct ErrorState: Equatable, Sendable {
             var message: String
         }
-    }
-
-    struct Environment: @unchecked Sendable {
-        let appEnvironment: AppEnvironment
-        let analytics: any AnalyticsService
     }
 
     struct Step: Identifiable, Equatable, Sendable {
