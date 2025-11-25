@@ -27,7 +27,9 @@ struct Effect<Action: Sendable>: Sendable {
 
     static func fireAndForget(_ work: @escaping @Sendable () async -> Void) -> Effect {
         Effect {
-            await work()
+            _ = Task.detached(priority: nil) {
+                await work()
+            }
             return nil
         }
     }
