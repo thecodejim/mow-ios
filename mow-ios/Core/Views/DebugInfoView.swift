@@ -179,11 +179,15 @@ private extension AppEnvironment.Name {
 // MARK: - Debug Info Button
 
 struct DebugInfoButton: View {
-    @State private var isShowingDebugInfo = false
+    @Binding private var isPresented: Bool
+    
+    init(isPresented: Binding<Bool>) {
+        self._isPresented = isPresented
+    }
     
     var body: some View {
         Button {
-            isShowingDebugInfo = true
+            isPresented = true
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "info.circle")
@@ -192,7 +196,7 @@ struct DebugInfoButton: View {
             .font(.caption)
             .foregroundStyle(.secondary)
         }
-        .sheet(isPresented: $isShowingDebugInfo) {
+        .sheet(isPresented: $isPresented) {
             DebugInfoView()
         }
     }

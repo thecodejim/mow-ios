@@ -9,6 +9,16 @@ struct HomeRootView: View {
             set: { store.send(.selectTab($0)) }
         )
     }
+    
+    private var debugInfoBinding: Binding<Bool> {
+        Binding(
+            get: { store.state.isShowingDebugInfo },
+            set: { value in
+                guard store.state.isDebugInfoButtonEnabled else { return }
+                store.send(.setDebugInfoPresented(value))
+            }
+        )
+    }
 
     var body: some View {
         content
@@ -73,7 +83,12 @@ struct HomeRootView: View {
                 .tabItem { Label(HomeDomain.Tab.deliveries.title, systemImage: HomeDomain.Tab.deliveries.icon) }
                 .tag(HomeDomain.Tab.deliveries)
 
-            ProfileView(profile: state.profile, onLogout: { store.send(.logoutTapped) })
+            ProfileView(
+                profile: state.profile,
+                onLogout: { store.send(.logoutTapped) },
+                debugInfoBinding: debugInfoBinding,
+                isDebugInfoButtonEnabled: store.state.isDebugInfoButtonEnabled
+            )
                 .tabItem { Label(HomeDomain.Tab.profile.title, systemImage: HomeDomain.Tab.profile.icon) }
                 .tag(HomeDomain.Tab.profile)
         }
@@ -186,6 +201,8 @@ private struct DeliveriesView: View {
 private struct ProfileView: View {
     let profile: HomeDomain.State.Profile
     let onLogout: () -> Void
+    let debugInfoBinding: Binding<Bool>
+    let isDebugInfoButtonEnabled: Bool
 
     var body: some View {
         NavigationStack {
@@ -210,7 +227,8 @@ private struct ProfileView: View {
             .navigationTitle("Profile")
             .safeAreaInset(edge: .bottom) {
                 VStack(spacing: 8) {
-                    DebugInfoButton()
+                    DebugInfoButton(isPresented: debugInfoBinding)
+                        .disabled(!isDebugInfoButtonEnabled)
                         .frame(maxWidth: .infinity)
                 }
                 .padding(.bottom, 24)
@@ -237,6 +255,15 @@ private extension HomeDomain.State {
             return state.alertMessage
         default:
             return nil
+        }
+    }
+
+    var isDebugInfoButtonEnabled: Bool {
+        switch self {
+        case .loading, .refreshing:
+            return false
+        default:
+            return true
         }
     }
 }

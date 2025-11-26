@@ -18,9 +18,11 @@ enum LoginDomain {
         
         struct LoadedState: Equatable, Sendable {
             var form: LoginForm
+            var isShowingDebugInfo: Bool
 
-            init(form: LoginForm = .init()) {
+            init(form: LoginForm = .init(), isShowingDebugInfo: Bool = false) {
                 self.form = form
+                self.isShowingDebugInfo = isShowingDebugInfo
             }
         }
         
@@ -40,6 +42,7 @@ enum LoginDomain {
         struct ErrorState: Equatable, Sendable {
             var form: LoginForm
             var message: String
+            var isShowingDebugInfo: Bool = false
         }
 
         struct LoginForm: Equatable, Sendable {
@@ -103,6 +106,7 @@ enum LoginDomain {
         case resetResponse(State.ResetResponse)
         case dismissForgot
         case clearError
+        case setDebugInfoPresented(Bool)
         case delegate(DelegateAction)
     }
 
@@ -135,18 +139,27 @@ enum LoginDomain {
             return .none
 
         case .submit:
-            let loadedState = state.currentLoadedState()
+            var loadedState = state.currentLoadedState()
 
             guard loadedState.form.email.isValidEmail else {
-                state = .error(.init(form: loadedState.form, message: LoginDomain.Copy.invalidEmail))
+                state = .error(.init(
+                    form: loadedState.form,
+                    message: LoginDomain.Copy.invalidEmail,
+                    isShowingDebugInfo: loadedState.isShowingDebugInfo
+                ))
                 return .none
             }
 
             guard loadedState.form.password.count >= LoginDomain.State.LoginForm.minPasswordLength else {
-                state = .error(.init(form: loadedState.form, message: LoginDomain.Copy.passwordTooShort))
+                state = .error(.init(
+                    form: loadedState.form,
+                    message: LoginDomain.Copy.passwordTooShort,
+                    isShowingDebugInfo: loadedState.isShowingDebugInfo
+                ))
                 return .none
             }
 
+            loadedState.isShowingDebugInfo = false
             state = .submitting(loadedState)
             let email = loadedState.form.email
             let password = loadedState.form.password
@@ -175,7 +188,11 @@ enum LoginDomain {
 
             case let .failure(error):
                 let loadedState = state.currentLoadedState()
-                state = .error(.init(form: loadedState.form, message: error.message))
+                state = .error(.init(
+                    form: loadedState.form,
+                    message: error.message,
+                    isShowingDebugInfo: loadedState.isShowingDebugInfo
+                ))
                 return .none
             }
 
@@ -239,7 +256,11 @@ enum LoginDomain {
 
         case .clearError:
             guard case let .error(errorState) = state else { return .none }
-            state = .loaded(.init(form: errorState.form))
+            state = .loaded(.init(form: errorState.form, isShowingDebugInfo: errorState.isShowingDebugInfo))
+            return .none
+
+        case let .setDebugInfoPresented(isPresented):
+            state.setDebugInfoPresented(isPresented)
             return .none
 
         case .delegate:
@@ -248,7 +269,40 @@ enum LoginDomain {
     }
 }
 
+extension LoginDomain.State {
+    var isShowingDebugInfo: Bool {
+        switch self {
+        case let .loaded(loadedState), let .submitting(loadedState):
+            return loadedState.isShowingDebugInfo
+        case let .error(errorState):
+            return errorState.isShowingDebugInfo
+        case let .forgotPassword(forgotState):
+            return forgotState.resume.isShowingDebugInfo
+        case .loading, .authenticated:
+            return false
+        }
+    }
+}
+
 private extension LoginDomain.State {
+    mutating func setDebugInfoPresented(_ isPresented: Bool) {
+        switch self {
+        case var .loaded(loadedState):
+            loadedState.isShowingDebugInfo = isPresented
+            self = .loaded(loadedState)
+        case var .error(errorState):
+            errorState.isShowingDebugInfo = isPresented
+            self = .error(errorState)
+        case var .forgotPassword(forgotState):
+            var resume = forgotState.resume
+            resume.isShowingDebugInfo = isPresented
+            forgotState.resume = resume
+            self = .forgotPassword(forgotState)
+        case .submitting, .loading, .authenticated:
+            break
+        }
+    }
+
     mutating func updateForm(_ update: (inout LoginDomain.State.LoginForm) -> Void) {
         switch self {
         case var .loaded(loadedState):
@@ -259,7 +313,7 @@ private extension LoginDomain.State {
             self = .submitting(loadedState)
         case var .error(errorState):
             update(&errorState.form)
-            self = .loaded(.init(form: errorState.form))
+            self = .loaded(.init(form: errorState.form, isShowingDebugInfo: errorState.isShowingDebugInfo))
         case var .forgotPassword(forgotState):
             update(&forgotState.resume.form)
             self = .forgotPassword(forgotState)
@@ -277,7 +331,7 @@ private extension LoginDomain.State {
         case let .loaded(loadedState), let .submitting(loadedState):
             return loadedState
         case let .error(errorState):
-            return .init(form: errorState.form)
+            return .init(form: errorState.form, isShowingDebugInfo: errorState.isShowingDebugInfo)
         case let .forgotPassword(forgotState):
             return forgotState.resume
         case .authenticated, .loading:

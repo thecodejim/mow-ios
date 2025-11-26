@@ -114,7 +114,8 @@ private struct LoginScreen: View {
 
             Spacer()
 
-            DebugInfoButton()
+            DebugInfoButton(isPresented: debugInfoBinding)
+                .disabled(!store.state.isDebugInfoButtonEnabled)
                 .frame(maxWidth: .infinity)
         }
         .padding(24)
@@ -128,6 +129,16 @@ private struct LoginScreen: View {
         .task {
             store.send(.onAppear)
         }
+    }
+    
+    private var debugInfoBinding: Binding<Bool> {
+        Binding(
+            get: { store.state.isShowingDebugInfo },
+            set: { value in
+                guard store.state.isDebugInfoButtonEnabled else { return }
+                store.send(.setDebugInfoPresented(value))
+            }
+        )
     }
 }
 
@@ -226,6 +237,15 @@ private extension LoginDomain.State {
             return true
         }
         return false
+    }
+
+    var isDebugInfoButtonEnabled: Bool {
+        switch self {
+        case .loading, .submitting:
+            return false
+        default:
+            return true
+        }
     }
 }
 

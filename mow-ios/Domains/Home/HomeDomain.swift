@@ -25,6 +25,7 @@ enum HomeDomain {
             var deliveries = Deliveries()
             var profile = Profile()
             var alertMessage: String?
+            var isShowingDebugInfo = false
         }
 
         struct ErrorState: Equatable, Sendable {
@@ -102,6 +103,7 @@ enum HomeDomain {
         case refreshResponse(Result<HomeSnapshot, DomainError>)
         case logoutTapped
         case clearAlert
+        case setDebugInfoPresented(Bool)
         case delegate(DelegateAction)
     }
 
@@ -134,12 +136,14 @@ enum HomeDomain {
             switch state {
             case .loading:
                 break
-            case let .loaded(loadedState):
+            case var .loaded(loadedState):
+                loadedState.isShowingDebugInfo = false
                 state = .refreshing(loadedState)
             case .refreshing:
                 return .none
             case let .error(errorState):
-                if let previous = errorState.previousState {
+                if var previous = errorState.previousState {
+                    previous.isShowingDebugInfo = false
                     state = .refreshing(previous)
                 } else {
                     state = .loading
@@ -211,6 +215,10 @@ enum HomeDomain {
             }
             return .none
 
+        case let .setDebugInfoPresented(isPresented):
+            state.setDebugInfoPresented(isPresented)
+            return .none
+
         case .delegate:
             return .none
         }
@@ -220,6 +228,37 @@ enum HomeDomain {
 extension HomeDomain.State {
     init() {
         self = .loading
+    }
+}
+
+extension HomeDomain.State {
+    var isShowingDebugInfo: Bool {
+        switch self {
+        case let .loaded(state), let .refreshing(state):
+            return state.isShowingDebugInfo
+        case let .error(errorState):
+            return errorState.previousState?.isShowingDebugInfo ?? false
+        case .loading:
+            return false
+        }
+    }
+}
+
+private extension HomeDomain.State {
+    mutating func setDebugInfoPresented(_ isPresented: Bool) {
+        switch self {
+        case var .loaded(state):
+            state.isShowingDebugInfo = isPresented
+            self = .loaded(state)
+        case var .error(errorState):
+            if var previous = errorState.previousState {
+                previous.isShowingDebugInfo = isPresented
+                errorState.previousState = previous
+                self = .error(errorState)
+            }
+        case .refreshing, .loading:
+            break
+        }
     }
 }
 
