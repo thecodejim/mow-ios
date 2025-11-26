@@ -210,7 +210,7 @@ private extension OnboardingDomain.State {
         appEnvironment: dependencies.environment,
         onboarding: .init(appEnvironment: dependencies.environment, analytics: dependencies.analytics),
         login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics),
-        home: .init(api: dependencies.api)
+        home: .init(appEnvironment: dependencies.environment, api: dependencies.api)
     )
     let appStore = Store(
         initialState: AppDomain.State(route: .onboarding(.init())),

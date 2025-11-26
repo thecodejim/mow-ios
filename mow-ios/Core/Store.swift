@@ -77,6 +77,10 @@ final class StoreScope<ParentState, ParentAction: Sendable, ParentEnvironment, C
     private let parent: Store<ParentState, ParentAction, ParentEnvironment>
     private let fromChildAction: (ChildAction) -> ParentAction
     private var cancellables: Set<AnyCancellable> = []
+    
+    var environment: ParentEnvironment {
+        parent.environment
+    }
 
     init(
         parent: Store<ParentState, ParentAction, ParentEnvironment>,

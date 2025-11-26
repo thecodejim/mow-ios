@@ -3,7 +3,7 @@ import SwiftUI
 struct DebugInfoView: View {
     @Environment(\.dismiss) private var dismiss
     
-    private let environment = AppEnvironment.current
+    let environment: AppEnvironment
     
     var body: some View {
         NavigationStack {
@@ -180,9 +180,11 @@ private extension AppEnvironment.Name {
 
 struct DebugInfoButton: View {
     @Binding private var isPresented: Bool
+    let environment: AppEnvironment
     
-    init(isPresented: Binding<Bool>) {
+    init(isPresented: Binding<Bool>, environment: AppEnvironment) {
         self._isPresented = isPresented
+        self.environment = environment
     }
     
     var body: some View {
@@ -191,13 +193,13 @@ struct DebugInfoButton: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "info.circle")
-                Text("v\(appVersion) • \(AppEnvironment.current.name.badgeText)")
+                Text("v\(appVersion) • \(environment.name.badgeText)")
             }
             .font(.caption)
             .foregroundStyle(.secondary)
         }
         .sheet(isPresented: $isPresented) {
-            DebugInfoView()
+            DebugInfoView(environment: environment)
         }
     }
     
@@ -207,6 +209,6 @@ struct DebugInfoButton: View {
 }
 
 #Preview {
-    DebugInfoView()
+    DebugInfoView(environment: .current)
 }
 

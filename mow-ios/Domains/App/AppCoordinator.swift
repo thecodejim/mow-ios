@@ -17,7 +17,7 @@ final class AppCoordinator: ObservableObject {
             appEnvironment: dependencies.environment,
             onboarding: .init(appEnvironment: dependencies.environment, analytics: dependencies.analytics),
             login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics),
-            home: .init(api: dependencies.api)
+            home: .init(appEnvironment: dependencies.environment, api: dependencies.api)
         )
         store = Store(initialState: .init(), environment: environment, reducer: AppDomain.reducer)
         route = store.state.route

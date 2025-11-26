@@ -2,6 +2,7 @@ import Foundation
 
 enum HomeDomain {
     struct Environment: @unchecked Sendable {
+        let appEnvironment: AppEnvironment
         let api: any APIService
     }
 
