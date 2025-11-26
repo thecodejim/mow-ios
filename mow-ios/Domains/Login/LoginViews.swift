@@ -114,7 +114,11 @@ private struct LoginScreen: View {
 
             Spacer()
 
-            DebugInfoButton(isPresented: debugInfoBinding, environment: store.environment.appEnvironment)
+            DebugInfoButton(
+                isPresented: debugInfoBinding,
+                environment: store.environment.appEnvironment,
+                deviceInfo: store.environment.login.deviceInfo
+            )
                 .disabled(!store.state.isDebugInfoButtonEnabled)
                 .frame(maxWidth: .infinity)
         }
@@ -254,8 +258,8 @@ private extension LoginDomain.State {
     let environment = AppDomain.Environment(
         appEnvironment: dependencies.environment,
         onboarding: .init(appEnvironment: dependencies.environment, analytics: dependencies.analytics),
-        login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics),
-        home: .init(appEnvironment: dependencies.environment, api: dependencies.api)
+        login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics, deviceInfo: dependencies.deviceInfo),
+        home: .init(appEnvironment: dependencies.environment, api: dependencies.api, deviceInfo: dependencies.deviceInfo)
     )
     let state = AppDomain.State(route: .login(.init()))
     let appStore = Store(
@@ -274,5 +278,5 @@ private extension LoginDomain.State {
         },
         action: AppDomain.Action.login
     )
-    return LoginRootView(store: scopedStore)
+    LoginRootView(store: scopedStore)
 }

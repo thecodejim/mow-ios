@@ -209,8 +209,8 @@ private extension OnboardingDomain.State {
     let environment = AppDomain.Environment(
         appEnvironment: dependencies.environment,
         onboarding: .init(appEnvironment: dependencies.environment, analytics: dependencies.analytics),
-        login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics),
-        home: .init(appEnvironment: dependencies.environment, api: dependencies.api)
+        login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics, deviceInfo: dependencies.deviceInfo),
+        home: .init(appEnvironment: dependencies.environment, api: dependencies.api, deviceInfo: dependencies.deviceInfo)
     )
     let appStore = Store(
         initialState: AppDomain.State(route: .onboarding(.init())),
@@ -228,5 +228,5 @@ private extension OnboardingDomain.State {
         },
         action: AppDomain.Action.onboarding
     )
-    return OnboardingRootView(store: scopedStore)
+    OnboardingRootView(store: scopedStore)
 }

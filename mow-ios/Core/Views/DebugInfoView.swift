@@ -4,6 +4,7 @@ struct DebugInfoView: View {
     @Environment(\.dismiss) private var dismiss
     
     let environment: AppEnvironment
+    let deviceInfo: any DeviceInfoService
     
     var body: some View {
         NavigationStack {
@@ -59,10 +60,10 @@ struct DebugInfoView: View {
     
     private var deviceSection: some View {
         Section {
-            InfoRow(label: "Device", value: deviceModel)
-            InfoRow(label: "iOS Version", value: UIDevice.current.systemVersion)
-            InfoRow(label: "Device Name", value: UIDevice.current.name)
-            InfoRow(label: "Identifier", value: identifierForVendor, monospaced: true)
+            InfoRow(label: "Device", value: deviceInfo.model)
+            InfoRow(label: "iOS Version", value: deviceInfo.systemVersion)
+            InfoRow(label: "Device Name", value: deviceInfo.name)
+            InfoRow(label: "Identifier", value: deviceInfo.identifierForVendor, monospaced: true)
         } header: {
             Label("Device", systemImage: "iphone")
         }
@@ -70,38 +71,15 @@ struct DebugInfoView: View {
     
     private var appSection: some View {
         Section {
-            InfoRow(label: "Version", value: appVersion)
-            InfoRow(label: "Build", value: buildNumber)
-            InfoRow(label: "Bundle ID", value: Bundle.main.bundleIdentifier ?? "Unknown", monospaced: true)
+            InfoRow(label: "Version", value: environment.appVersion)
+            InfoRow(label: "Build", value: environment.buildNumber)
+            InfoRow(label: "Bundle ID", value: environment.bundleIdentifier, monospaced: true)
         } header: {
             Label("App", systemImage: "app.badge")
         }
     }
     
-    // MARK: - Computed Properties
-    
-    private var deviceModel: String {
-        var systemInfo = utsname()
-        uname(&systemInfo)
-        let machineMirror = Mirror(reflecting: systemInfo.machine)
-        let identifier = machineMirror.children.reduce("") { identifier, element in
-            guard let value = element.value as? Int8, value != 0 else { return identifier }
-            return identifier + String(UnicodeScalar(UInt8(value)))
-        }
-        return identifier
-    }
-    
-    private var identifierForVendor: String {
-        UIDevice.current.identifierForVendor?.uuidString ?? "Unavailable"
-    }
-    
-    private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
-    }
-    
-    private var buildNumber: String {
-        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
-    }
+    // MARK: - Helpers
     
     private func maskedToken(_ token: String) -> String {
         guard token.count > 8 else { return String(repeating: "•", count: token.count) }
@@ -181,10 +159,12 @@ private extension AppEnvironment.Name {
 struct DebugInfoButton: View {
     @Binding private var isPresented: Bool
     let environment: AppEnvironment
+    let deviceInfo: any DeviceInfoService
     
-    init(isPresented: Binding<Bool>, environment: AppEnvironment) {
+    init(isPresented: Binding<Bool>, environment: AppEnvironment, deviceInfo: any DeviceInfoService) {
         self._isPresented = isPresented
         self.environment = environment
+        self.deviceInfo = deviceInfo
     }
     
     var body: some View {
@@ -193,22 +173,17 @@ struct DebugInfoButton: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "info.circle")
-                Text("v\(appVersion) • \(environment.name.badgeText)")
+                Text("v\(environment.appVersion) • \(environment.name.badgeText)")
             }
             .font(.caption)
             .foregroundStyle(.secondary)
         }
         .sheet(isPresented: $isPresented) {
-            DebugInfoView(environment: environment)
+            DebugInfoView(environment: environment, deviceInfo: deviceInfo)
         }
-    }
-    
-    private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
     }
 }
 
 #Preview {
-    DebugInfoView(environment: .current)
+    DebugInfoView(environment: .current, deviceInfo: MockDeviceInfoService())
 }
-

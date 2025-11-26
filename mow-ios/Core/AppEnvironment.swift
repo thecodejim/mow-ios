@@ -40,6 +40,9 @@ struct AppEnvironment {
     let healthCheckToken: String
     let featureFlags: FeatureFlags
     let logLevel: LogLevel
+    let appVersion: String
+    let buildNumber: String
+    let bundleIdentifier: String
 
     static let current = AppEnvironment()
 
@@ -55,6 +58,10 @@ struct AppEnvironment {
         featureFlags = FeatureFlags(useMockData: info.bool(.useMockData))
         let resolvedLevel = info.string(.logLevel, fallback: LogLevel.fallback.rawValue)
         logLevel = LogLevel(rawValue: resolvedLevel.uppercased()) ?? .fallback
+        
+        appVersion = info.string(.version, fallback: "Unknown")
+        buildNumber = info.string(.build, fallback: "Unknown")
+        bundleIdentifier = bundle.bundleIdentifier ?? "Unknown"
     }
 }
 
@@ -69,6 +76,8 @@ private extension AppEnvironment {
             case healthCheckToken = "MOWHealthCheckToken"
             case useMockData = "MOWUseMockData"
             case logLevel = "MOWLogLevel"
+            case version = "CFBundleShortVersionString"
+            case build = "CFBundleVersion"
         }
 
         private let bundle: Bundle

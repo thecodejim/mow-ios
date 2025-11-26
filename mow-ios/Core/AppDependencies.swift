@@ -20,17 +20,20 @@ struct AppDependencies {
     let api: any APIService
     let keychain: any KeychainService
     let analytics: any AnalyticsService
+    let deviceInfo: any DeviceInfoService
 
     init(
         environment: AppEnvironment,
         api: some APIService,
         keychain: some KeychainService,
-        analytics: some AnalyticsService
+        analytics: some AnalyticsService,
+        deviceInfo: some DeviceInfoService
     ) {
         self.environment = environment
         self.api = api
         self.keychain = keychain
         self.analytics = analytics
+        self.deviceInfo = deviceInfo
     }
 
     static func live(environment: AppEnvironment = .current) -> AppDependencies {
@@ -38,7 +41,8 @@ struct AppDependencies {
             environment: environment,
             api: MockAPIService(),
             keychain: MockKeychainService(),
-            analytics: MockAnalyticsService()
+            analytics: MockAnalyticsService(),
+            deviceInfo: LiveDeviceInfoService()
         )
     }
 }

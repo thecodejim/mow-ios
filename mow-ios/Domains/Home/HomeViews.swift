@@ -88,7 +88,8 @@ struct HomeRootView: View {
                 onLogout: { store.send(.logoutTapped) },
                 debugInfoBinding: debugInfoBinding,
                 isDebugInfoButtonEnabled: store.state.isDebugInfoButtonEnabled,
-                environment: store.environment.appEnvironment
+                environment: store.environment.appEnvironment,
+                deviceInfo: store.environment.home.deviceInfo
             )
                 .tabItem { Label(HomeDomain.Tab.profile.title, systemImage: HomeDomain.Tab.profile.icon) }
                 .tag(HomeDomain.Tab.profile)
@@ -205,6 +206,7 @@ private struct ProfileView: View {
     let debugInfoBinding: Binding<Bool>
     let isDebugInfoButtonEnabled: Bool
     let environment: AppEnvironment
+    let deviceInfo: any DeviceInfoService
 
     var body: some View {
         NavigationStack {
@@ -229,7 +231,7 @@ private struct ProfileView: View {
             .navigationTitle("Profile")
             .safeAreaInset(edge: .bottom) {
                 VStack(spacing: 8) {
-                    DebugInfoButton(isPresented: debugInfoBinding, environment: environment)
+                    DebugInfoButton(isPresented: debugInfoBinding, environment: environment, deviceInfo: deviceInfo)
                         .disabled(!isDebugInfoButtonEnabled)
                         .frame(maxWidth: .infinity)
                 }
@@ -275,8 +277,8 @@ private extension HomeDomain.State {
     let environment = AppDomain.Environment(
         appEnvironment: dependencies.environment,
         onboarding: .init(appEnvironment: dependencies.environment, analytics: dependencies.analytics),
-        login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics),
-        home: .init(appEnvironment: dependencies.environment, api: dependencies.api)
+        login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics, deviceInfo: dependencies.deviceInfo),
+        home: .init(appEnvironment: dependencies.environment, api: dependencies.api, deviceInfo: dependencies.deviceInfo)
     )
     let state = AppDomain.State(route: .home(.init()))
     let appStore = Store(
@@ -295,5 +297,5 @@ private extension HomeDomain.State {
         },
         action: AppDomain.Action.home
     )
-    return HomeRootView(store: scopedStore)
+    HomeRootView(store: scopedStore)
 }

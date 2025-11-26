@@ -6,6 +6,7 @@ enum LoginDomain {
         let api: any APIService
         let keychain: any KeychainService
         let analytics: any AnalyticsService
+        let deviceInfo: any DeviceInfoService
     }
 
     enum State: Equatable, Sendable {

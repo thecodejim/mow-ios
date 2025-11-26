@@ -4,6 +4,7 @@ enum HomeDomain {
     struct Environment: @unchecked Sendable {
         let appEnvironment: AppEnvironment
         let api: any APIService
+        let deviceInfo: any DeviceInfoService
     }
 
     enum Tab: String, CaseIterable, Sendable {
