@@ -254,29 +254,13 @@ private extension LoginDomain.State {
 }
 
 #Preview {
-    let dependencies = AppDependencies.live()
-    let environment = AppDomain.Environment(
-        appEnvironment: dependencies.environment,
-        onboarding: .init(appEnvironment: dependencies.environment, analytics: dependencies.analytics),
-        login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics, deviceInfo: dependencies.deviceInfo),
-        home: .init(appEnvironment: dependencies.environment, api: dependencies.api, deviceInfo: dependencies.deviceInfo)
-    )
-    let state = AppDomain.State(route: .login(.init()))
-    let appStore = Store(
-        initialState: state,
-        environment: environment,
-        reducer: { state, action, environment in
-            AppDomain.reducer(state: &state, action: action, environment: environment)
-        }
-    )
-    let scopedStore = appStore.scope(
-        state: { state in
-            if case let .login(childState) = state.route {
-                return childState
-            }
-            return .init()
-        },
-        action: AppDomain.Action.login
-    )
-    LoginRootView(store: scopedStore)
+    @Previewable @StateObject var coordinator: AppCoordinator = {
+        let dependencies = AppDependencies.live(environment: .preview)
+        let coordinator = AppCoordinator(dependencies: dependencies)
+        // Set the initial route to login
+        coordinator.store.send(.showLogin)
+        return coordinator
+    }()
+    
+    LoginRootView(store: coordinator.loginStore)
 }

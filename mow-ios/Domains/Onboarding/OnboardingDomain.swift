@@ -1,28 +1,28 @@
 import Foundation
 
 enum OnboardingDomain {
-    struct Environment: @unchecked Sendable {
+    struct Environment {
         let appEnvironment: AppEnvironment
         let analytics: any AnalyticsService
     }
 
-    enum State: Equatable, Sendable {
+    enum State: Equatable {
         case loading
         case loaded(LoadedState)
         case error(ErrorState)
 
-        struct LoadedState: Equatable, Sendable {
+        struct LoadedState: Equatable {
             var steps: [Step] = Step.catalog
             var currentIndex = 0
             var isCompleting = false
         }
 
-        struct ErrorState: Equatable, Sendable {
+        struct ErrorState: Equatable {
             var message: String
         }
         
-        struct Step: Identifiable, Equatable, Sendable {
-            enum Accent: String, Equatable, CaseIterable, Sendable {
+        struct Step: Identifiable, Equatable {
+            enum Accent: String, Equatable, CaseIterable {
                 case mint
                 case orange
                 case blue
@@ -37,11 +37,11 @@ enum OnboardingDomain {
         }
     }
 
-    enum DelegateAction: Equatable, Sendable {
+    enum DelegateAction: Equatable {
         case finished
     }
 
-    enum Action: Equatable, Sendable {
+    enum Action: Equatable {
         case onAppear
         case advance
         case back

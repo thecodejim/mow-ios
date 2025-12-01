@@ -1,26 +1,26 @@
 import Foundation
 
 enum HomeDomain {
-    struct Environment: @unchecked Sendable {
+    struct Environment {
         let appEnvironment: AppEnvironment
         let api: any APIService
         let deviceInfo: any DeviceInfoService
     }
 
-    enum Tab: String, CaseIterable, Sendable {
+    enum Tab: String, CaseIterable {
         case dashboard
         case meals
         case deliveries
         case profile
     }
 
-    enum State: Equatable, Sendable {
+    enum State: Equatable {
         case loading
         case loaded(LoadedState)
         case refreshing(LoadedState)
         case error(ErrorState)
 
-        struct LoadedState: Equatable, Sendable {
+        struct LoadedState: Equatable {
             var selectedTab: Tab = .dashboard
             var dashboard = Dashboard()
             var meals = Meals()
@@ -30,13 +30,13 @@ enum HomeDomain {
             var isShowingDebugInfo = false
         }
 
-        struct ErrorState: Equatable, Sendable {
+        struct ErrorState: Equatable {
             var message: String
             var previousState: LoadedState?
         }
 
-        struct Dashboard: Equatable, Sendable {
-            struct Stat: Identifiable, Equatable, Sendable {
+        struct Dashboard: Equatable {
+            struct Stat: Identifiable, Equatable {
                 let id = UUID()
                 let label: String
                 let value: String
@@ -55,8 +55,8 @@ enum HomeDomain {
             }
         }
 
-        struct Meals: Equatable, Sendable {
-            struct Item: Identifiable, Equatable, Sendable {
+        struct Meals: Equatable {
+            struct Item: Identifiable, Equatable {
                 let id = UUID()
                 let title: String
                 let calories: Int
@@ -66,8 +66,8 @@ enum HomeDomain {
             var items: [Item] = []
         }
 
-        struct Deliveries: Equatable, Sendable {
-            struct Item: Identifiable, Equatable, Sendable {
+        struct Deliveries: Equatable {
+            struct Item: Identifiable, Equatable {
                 let id = UUID()
                 let recipient: String
                 let address: String
@@ -77,14 +77,14 @@ enum HomeDomain {
             var items: [Item] = []
         }
 
-        struct Profile: Equatable, Sendable {
+        struct Profile: Equatable {
             var name = ""
             var role = ""
             var territory = ""
         }
     }
 
-    enum DomainError: Error, Equatable, Sendable {
+    enum DomainError: Error, Equatable {
         case message(String)
 
         var description: String {
@@ -94,11 +94,11 @@ enum HomeDomain {
         }
     }
 
-    enum DelegateAction: Equatable, Sendable {
+    enum DelegateAction: Equatable {
         case logout
     }
 
-    enum Action: Equatable, Sendable {
+    enum Action: Equatable {
         case onAppear
         case selectTab(Tab)
         case refresh
@@ -152,12 +152,14 @@ enum HomeDomain {
                 }
             }
 
+            let refreshFallbackError = HomeDomain.Copy.refreshFallbackError
+
             return .task {
                 do {
                     let snapshot = try await environment.api.fetchHomeSnapshot()
                     return .refreshResponse(.success(snapshot))
                 } catch {
-                    let message = (error as? LocalizedError)?.errorDescription ?? HomeDomain.Copy.refreshFallbackError
+                    let message = (error as? LocalizedError)?.errorDescription ?? refreshFallbackError
                     return .refreshResponse(.failure(.message(message)))
                 }
             }

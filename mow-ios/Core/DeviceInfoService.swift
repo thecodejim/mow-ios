@@ -1,6 +1,6 @@
 import UIKit
 
-protocol DeviceInfoService: Sendable {
+protocol DeviceInfoService {
     var model: String { get }
     var systemVersion: String { get }
     var name: String { get }
@@ -50,4 +50,3 @@ struct MockDeviceInfoService: DeviceInfoService {
         self.identifierForVendor = identifierForVendor
     }
 }
-

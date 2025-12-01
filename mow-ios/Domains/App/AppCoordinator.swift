@@ -23,32 +23,17 @@ final class AppCoordinator: ObservableObject {
         route = store.state.route
 
         onboardingStore = store.scope(
-            state: { state in
-                guard case let .onboarding(childState) = state.route else {
-                    return .init()
-                }
-                return childState
-            },
+            state: { $0.onboarding },
             action: AppDomain.Action.onboarding
         )
 
         loginStore = store.scope(
-            state: { state in
-                guard case let .login(childState) = state.route else {
-                    return .init()
-                }
-                return childState
-            },
+            state: { $0.login },
             action: AppDomain.Action.login
         )
 
         homeStore = store.scope(
-            state: { state in
-                guard case let .home(childState) = state.route else {
-                    return .init()
-                }
-                return childState
-            },
+            state: { $0.home },
             action: AppDomain.Action.home
         )
 

@@ -1,7 +1,7 @@
 import Foundation
 
 enum LoginDomain {
-    struct Environment: @unchecked Sendable {
+    struct Environment {
         let appEnvironment: AppEnvironment
         let api: any APIService
         let keychain: any KeychainService
@@ -9,7 +9,7 @@ enum LoginDomain {
         let deviceInfo: any DeviceInfoService
     }
 
-    enum State: Equatable, Sendable {
+    enum State: Equatable {
         case loading
         case loaded(LoadedState)
         case submitting(LoadedState)
@@ -17,7 +17,7 @@ enum LoginDomain {
         case authenticated(AuthSession)
         case error(ErrorState)
         
-        struct LoadedState: Equatable, Sendable {
+        struct LoadedState: Equatable {
             var form: LoginForm
             var isShowingDebugInfo: Bool
 
@@ -27,8 +27,8 @@ enum LoginDomain {
             }
         }
         
-        struct ForgotPasswordState: Equatable, Sendable {
-            enum Status: Equatable, Sendable {
+        struct ForgotPasswordState: Equatable {
+            enum Status: Equatable {
                 case idle
                 case sending
                 case success(message: String)
@@ -40,13 +40,13 @@ enum LoginDomain {
             var resume: LoadedState = .init()
         }
 
-        struct ErrorState: Equatable, Sendable {
+        struct ErrorState: Equatable {
             var form: LoginForm
             var message: String
             var isShowingDebugInfo: Bool = false
         }
 
-        struct LoginForm: Equatable, Sendable {
+        struct LoginForm: Equatable {
             var email: String
             var password: String
             var isSecureEntry: Bool
@@ -66,18 +66,18 @@ enum LoginDomain {
             }
         }
         
-        enum LoginResponse: Equatable, Sendable {
+        enum LoginResponse: Equatable {
             case success(AuthSession)
             case failure(DomainError)
         }
 
-        enum ResetResponse: Equatable, Sendable {
+        enum ResetResponse: Equatable {
             case success
             case failure(DomainError)
         }
     }
 
-    enum DomainError: Error, Equatable, Sendable {
+    enum DomainError: Error, Equatable {
         case validation(String)
         case service(String)
 
@@ -89,12 +89,12 @@ enum LoginDomain {
         }
     }
 
-    enum DelegateAction: Equatable, Sendable {
+    enum DelegateAction: Equatable {
         case authenticated(AuthSession)
         case logout
     }
 
-    enum Action: Equatable, Sendable {
+    enum Action: Equatable {
         case onAppear
         case emailChanged(String)
         case passwordChanged(String)
@@ -164,6 +164,7 @@ enum LoginDomain {
             state = .submitting(loadedState)
             let email = loadedState.form.email
             let password = loadedState.form.password
+            let loginFallbackError = LoginDomain.Copy.loginFallbackError
 
             return .task {
                 do {
@@ -172,7 +173,7 @@ enum LoginDomain {
                     await environment.analytics.track(event: LoginDomain.AnalyticsEvent.loginSuccess, metadata: [:])
                     return .loginResponse(.success(session))
                 } catch {
-                    let message = (error as? LocalizedError)?.errorDescription ?? LoginDomain.Copy.loginFallbackError
+                    let message = (error as? LocalizedError)?.errorDescription ?? loginFallbackError
                     await environment.analytics.track(
                         event: LoginDomain.AnalyticsEvent.loginFailure,
                         metadata: ["reason": message]
@@ -225,6 +226,7 @@ enum LoginDomain {
             state = .forgotPassword(forgotState)
 
             let email = forgotState.email
+            let resetFallbackError = LoginDomain.Copy.resetFallbackError
 
             return .task {
                 do {
@@ -232,7 +234,7 @@ enum LoginDomain {
                     await environment.analytics.track(event: LoginDomain.AnalyticsEvent.resetRequested, metadata: [:])
                     return .resetResponse(.success)
                 } catch {
-                    let message = (error as? LocalizedError)?.errorDescription ?? LoginDomain.Copy.resetFallbackError
+                    let message = (error as? LocalizedError)?.errorDescription ?? resetFallbackError
                     return .resetResponse(.failure(.service(message)))
                 }
             }

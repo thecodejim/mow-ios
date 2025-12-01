@@ -85,7 +85,7 @@ struct DebugInfoView: View {
         guard token.count > 8 else { return String(repeating: "•", count: token.count) }
         let prefix = token.prefix(4)
         let suffix = token.suffix(4)
-        let masked = String(repeating: "•", count: min(token.count - 8, 12))
+        let masked = String(repeating: "•", count: token.count - 8)
         return "\(prefix)\(masked)\(suffix)"
     }
 }
@@ -185,5 +185,5 @@ struct DebugInfoButton: View {
 }
 
 #Preview {
-    DebugInfoView(environment: .current, deviceInfo: MockDeviceInfoService())
+    DebugInfoView(environment: .preview, deviceInfo: MockDeviceInfoService())
 }

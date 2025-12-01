@@ -6,7 +6,6 @@ struct OnboardingRootView: View {
     var body: some View {
         NavigationStack {
             OnboardingFlowView(store: store)
-                .navigationTitle("Meals on Wheels")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar(.hidden, for: .navigationBar)
         }
@@ -205,28 +204,10 @@ private extension OnboardingDomain.State {
 }
 
 #Preview {
-    let dependencies = AppDependencies.live()
-    let environment = AppDomain.Environment(
-        appEnvironment: dependencies.environment,
-        onboarding: .init(appEnvironment: dependencies.environment, analytics: dependencies.analytics),
-        login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics, deviceInfo: dependencies.deviceInfo),
-        home: .init(appEnvironment: dependencies.environment, api: dependencies.api, deviceInfo: dependencies.deviceInfo)
-    )
-    let appStore = Store(
-        initialState: AppDomain.State(route: .onboarding(.init())),
-        environment: environment,
-        reducer: { state, action, environment in
-            AppDomain.reducer(state: &state, action: action, environment: environment)
-        }
-    )
-    let scopedStore = appStore.scope(
-        state: { state in
-            if case let .onboarding(onboardingState) = state.route {
-                return onboardingState
-            }
-            return .init()
-        },
-        action: AppDomain.Action.onboarding
-    )
-    OnboardingRootView(store: scopedStore)
+    @Previewable @StateObject var coordinator: AppCoordinator = {
+        let dependencies = AppDependencies.live(environment: .preview)
+        return AppCoordinator(dependencies: dependencies)
+    }()
+    
+    OnboardingRootView(store: coordinator.onboardingStore)
 }

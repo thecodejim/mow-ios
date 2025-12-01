@@ -36,7 +36,7 @@ struct AppDependencies {
         self.deviceInfo = deviceInfo
     }
 
-    static func live(environment: AppEnvironment = .current) -> AppDependencies {
+    static func live(environment: AppEnvironment) -> AppDependencies {
         AppDependencies(
             environment: environment,
             api: MockAPIService(),
@@ -49,34 +49,34 @@ struct AppDependencies {
 
 // MARK: - DTOs
 
-struct AuthSession: Equatable, Sendable {
+struct AuthSession: Equatable {
     let token: String
     let displayName: String
 }
 
-struct HomeSnapshot: Equatable, Sendable {
-    struct DashboardStat: Identifiable, Equatable, Sendable {
+struct HomeSnapshot: Equatable {
+    struct DashboardStat: Identifiable, Equatable {
         let id = UUID()
         let label: String
         let value: String
         let trend: String
     }
 
-    struct Meal: Identifiable, Equatable, Sendable {
+    struct Meal: Identifiable, Equatable {
         let id = UUID()
         let title: String
         let calories: Int
         let deliveryTime: Date
     }
 
-    struct Delivery: Identifiable, Equatable, Sendable {
+    struct Delivery: Identifiable, Equatable {
         let id = UUID()
         let recipient: String
         let address: String
         let distanceMiles: Double
     }
 
-    struct Profile: Equatable, Sendable {
+    struct Profile: Equatable {
         let name: String
         let role: String
         let territory: String
@@ -91,7 +91,7 @@ struct HomeSnapshot: Equatable, Sendable {
 
 // MARK: - Mock services
 
-enum MockAPIError: Error, LocalizedError, Equatable, Sendable {
+enum MockAPIError: Error, LocalizedError, Equatable {
     case invalidCredentials
     case offline
 

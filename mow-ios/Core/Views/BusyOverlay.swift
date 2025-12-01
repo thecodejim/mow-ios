@@ -19,3 +19,7 @@ struct BusyOverlay: View {
         .transition(.opacity)
     }
 }
+
+#Preview {
+    BusyOverlay(text: "Busy...")
+}

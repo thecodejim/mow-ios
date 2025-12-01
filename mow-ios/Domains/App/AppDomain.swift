@@ -1,24 +1,27 @@
 import Foundation
 
 enum AppDomain {
-    struct Environment: @unchecked Sendable {
+    struct Environment {
         let appEnvironment: AppEnvironment
         let onboarding: OnboardingDomain.Environment
         let login: LoginDomain.Environment
         let home: HomeDomain.Environment
     }
 
-    struct State: Equatable, Sendable {
-        enum Route: Equatable, Sendable {
-            case onboarding(OnboardingDomain.State)
-            case login(LoginDomain.State)
-            case home(HomeDomain.State)
+    struct State: Equatable {
+        var onboarding: OnboardingDomain.State = .init()
+        var login: LoginDomain.State = .init()
+        var home: HomeDomain.State = .init()
+        var route: Route = .onboarding
+
+        enum Route: Equatable {
+            case onboarding
+            case login
+            case home
         }
-        
-        var route: Route = .onboarding(.init())
     }
 
-    enum Action: Equatable, Sendable {
+    enum Action: Equatable {
         case onboarding(OnboardingDomain.Action)
         case login(LoginDomain.Action)
         case home(HomeDomain.Action)
@@ -29,64 +32,73 @@ enum AppDomain {
 
     static func reducer(state: inout State, action: Action, environment: Environment) -> Effect<Action> {
         switch action {
+        // MARK: - Navigation / top-level
+
         case .showLogin, .logout:
-            state.route = .login(.init())
+            state.login = .init()
+            state.route = .login
             return .none
 
         case .showHome:
-            state.route = .home(.init())
+            state.home = .init()
+            state.route = .home
             return .none
 
+        // MARK: - Onboarding
+
         case .onboarding(.delegate(.finished)):
-            state.route = .login(.init())
+            state.login = .init()
+            state.route = .login
             return .none
 
         case let .onboarding(childAction):
-            guard case var .onboarding(childState) = state.route else {
-                return .none
-            }
+            // ignore onboarding actions when not on that route
+            guard state.route == .onboarding else { return .none }
+
             let effect = OnboardingDomain.reducer(
-                state: &childState,
+                state: &state.onboarding,
                 action: childAction,
                 environment: environment.onboarding
             )
-            state.route = .onboarding(childState)
             return effect.map(Action.onboarding)
 
+        // MARK: - Login
+
         case .login(.delegate(.authenticated)):
-            state.route = .home(.init())
+            state.home = .init()
+            state.route = .home
             return .none
 
         case .login(.delegate(.logout)):
-            state.route = .login(.init())
+            state.login = .init()
+            state.route = .login
             return .none
 
         case let .login(childAction):
-            guard case var .login(childState) = state.route else {
-                return .none
-            }
+            guard state.route == .login else { return .none }
+
             let effect = LoginDomain.reducer(
-                state: &childState,
+                state: &state.login,
                 action: childAction,
                 environment: environment.login
             )
-            state.route = .login(childState)
             return effect.map(Action.login)
 
+        // MARK: - Home
+
         case .home(.delegate(.logout)):
-            state.route = .login(.init())
+            state.login = .init()
+            state.route = .login
             return .none
 
         case let .home(childAction):
-            guard case var .home(childState) = state.route else {
-                return .none
-            }
+            guard state.route == .home else { return .none }
+
             let effect = HomeDomain.reducer(
-                state: &childState,
+                state: &state.home,
                 action: childAction,
                 environment: environment.home
             )
-            state.route = .home(childState)
             return effect.map(Action.home)
         }
     }

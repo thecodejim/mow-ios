@@ -1,9 +1,9 @@
 import Combine
 
-struct Effect<Action: Sendable>: Sendable {
-    private let operation: @Sendable () async -> Action?
+struct Effect<Action> {
+    private let operation: () async -> Action?
 
-    init(operation: @escaping @Sendable () async -> Action?) {
+    init(operation: @escaping () async -> Action?) {
         self.operation = operation
     }
 
@@ -19,15 +19,15 @@ struct Effect<Action: Sendable>: Sendable {
         Effect { action }
     }
 
-    static func task(_ work: @escaping @Sendable () async -> Action) -> Effect {
+    static func task(_ work: @escaping () async -> Action) -> Effect {
         Effect {
             await work()
         }
     }
 
-    static func fireAndForget(_ work: @escaping @Sendable () async -> Void) -> Effect {
+    static func fireAndForget(_ work: @escaping () async -> Void) -> Effect {
         Effect {
-            _ = Task.detached(priority: nil) {
+            Task {
                 await work()
             }
             return nil
@@ -35,13 +35,14 @@ struct Effect<Action: Sendable>: Sendable {
     }
 }
 
-typealias Reducer<State, Action: Sendable, Environment> = @MainActor @Sendable (inout State, Action, Environment) -> Effect<Action>
+typealias Reducer<State, Action, Environment> = @MainActor (inout State, Action, Environment) -> Effect<Action>
 
 @MainActor
-final class Store<State, Action: Sendable, Environment>: ObservableObject {
+final class Store<State, Action, Environment>: ObservableObject {
     @Published private(set) var state: State
     let environment: Environment
     private let reducer: Reducer<State, Action, Environment>
+    private var scopedCancellables: [ObjectIdentifier: AnyCancellable] = [:]
 
     init(initialState: State, environment: Environment, reducer: @escaping Reducer<State, Action, Environment>) {
         self.state = initialState
@@ -62,25 +63,45 @@ final class Store<State, Action: Sendable, Environment>: ObservableObject {
         }
     }
 
-    func scope<ChildState, ChildAction: Sendable>(
-        state toChildState: @escaping (State) -> ChildState,
-        action fromChildAction: @escaping (ChildAction) -> Action
-    ) -> StoreScope<State, Action, Environment, ChildState, ChildAction> {
-        StoreScope(parent: self, toChildState: toChildState, fromChildAction: fromChildAction)
-    }
+    func scope<ChildState, ChildAction>(
+            state toChildState: @escaping (State) -> ChildState,
+            action fromChildAction: @escaping (ChildAction) -> Action
+        ) -> StoreScope<State, Action, Environment, ChildState, ChildAction> {
+            let scope = StoreScope(
+                parent: self,
+                toChildState: toChildState,
+                fromChildAction: fromChildAction
+            )
+
+            let id = ObjectIdentifier(scope)
+
+            let cancellable = $state
+                .map(toChildState)
+                .sink { [weak scope] childState in
+                    scope?.state = childState
+                }
+
+            scopedCancellables[id] = cancellable
+
+            return scope
+        }
+
+        func removeScope<ChildState, ChildAction>(
+            _ scope: StoreScope<State, Action, Environment, ChildState, ChildAction>
+        ) {
+            let id = ObjectIdentifier(scope)
+            scopedCancellables[id] = nil
+        }
 }
 
 @MainActor
-final class StoreScope<ParentState, ParentAction: Sendable, ParentEnvironment, ChildState, ChildAction: Sendable>: ObservableObject {
-    @Published private(set) var state: ChildState
-
-    private let parent: Store<ParentState, ParentAction, ParentEnvironment>
-    private let fromChildAction: (ChildAction) -> ParentAction
-    private var cancellables: Set<AnyCancellable> = []
+final class StoreScope<ParentState, ParentAction, ParentEnvironment, ChildState, ChildAction>: ObservableObject {
+    @Published fileprivate(set) var state: ChildState
     
-    var environment: ParentEnvironment {
-        parent.environment
-    }
+    let environment: ParentEnvironment
+
+    private weak var parent: Store<ParentState, ParentAction, ParentEnvironment>?
+    private let fromChildAction: (ChildAction) -> ParentAction
 
     init(
         parent: Store<ParentState, ParentAction, ParentEnvironment>,
@@ -89,18 +110,12 @@ final class StoreScope<ParentState, ParentAction: Sendable, ParentEnvironment, C
     ) {
         self.parent = parent
         self.fromChildAction = fromChildAction
+        self.environment = parent.environment
         self.state = toChildState(parent.state)
-
-        parent.$state
-            .map(toChildState)
-            .sink { [weak self] childState in
-                self?.state = childState
-            }
-            .store(in: &cancellables)
     }
 
     func send(_ action: ChildAction) {
-        parent.send(fromChildAction(action))
+        parent?.send(fromChildAction(action))
     }
 }
 

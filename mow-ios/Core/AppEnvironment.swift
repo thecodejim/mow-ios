@@ -118,3 +118,47 @@ private extension AppEnvironment {
         }
     }
 }
+
+extension AppEnvironment {
+    init(
+        name: Name,
+        apiBaseURL: URL,
+        docsURL: URL,
+        portalURL: URL,
+        telemetryURL: URL,
+        healthCheckToken: String = "preview-token",
+        featureFlags: FeatureFlags = .init(useMockData: true),
+        logLevel: LogLevel = .debug,
+        appVersion: String = "0.0.0",
+        buildNumber: String = "0",
+        bundleIdentifier: String = "com.example.mow.preview"
+    ) {
+        self.name = name
+        self.apiBaseURL = apiBaseURL
+        self.docsURL = docsURL
+        self.portalURL = portalURL
+        self.telemetryURL = telemetryURL
+        self.healthCheckToken = healthCheckToken
+        self.featureFlags = featureFlags
+        self.logLevel = logLevel
+        self.appVersion = appVersion
+        self.buildNumber = buildNumber
+        self.bundleIdentifier = bundleIdentifier
+    }
+}
+
+extension AppEnvironment {
+    static let preview = AppEnvironment(
+        name: .localDev,
+        apiBaseURL: URL(string: "https://api.preview.example.com")!,
+        docsURL: URL(string: "https://docs.preview.example.com")!,
+        portalURL: URL(string: "https://portal.preview.example.com")!,
+        telemetryURL: URL(string: "https://telemetry.preview.example.com")!,
+        healthCheckToken: "preview-health-token",
+        featureFlags: .init(useMockData: true),
+        logLevel: .debug,
+        appVersion: "0.1.0-preview",
+        buildNumber: "1",
+        bundleIdentifier: "com.example.mow.preview"
+    )
+}
