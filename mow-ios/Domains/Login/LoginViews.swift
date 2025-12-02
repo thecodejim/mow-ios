@@ -117,7 +117,7 @@ private struct LoginScreen: View {
             DebugInfoButton(
                 isPresented: debugInfoBinding,
                 environment: store.environment.appEnvironment,
-                deviceInfo: store.environment.login.deviceInfo
+                deviceInfo: store.environment.deviceInfo
             )
                 .disabled(!store.state.isDebugInfoButtonEnabled)
                 .frame(maxWidth: .infinity)
@@ -128,8 +128,10 @@ private struct LoginScreen: View {
         .overlay {
             if store.state.isSubmitting {
                 BusyOverlay(text: "Checking your credentials…")
+                    .transition(.opacity)
             }
         }
+        .animation(.easeInOut, value: store.state.isSubmitting)
         .task {
             store.send(.onAppear)
         }
@@ -255,7 +257,7 @@ private extension LoginDomain.State {
 
 #Preview {
     @Previewable @StateObject var coordinator: AppCoordinator = {
-        let dependencies = AppDependencies.live(environment: .preview)
+        let dependencies = AppDependencies.mock(environment: .preview)
         let coordinator = AppCoordinator(dependencies: dependencies)
         // Set the initial route to login
         coordinator.store.send(.showLogin)

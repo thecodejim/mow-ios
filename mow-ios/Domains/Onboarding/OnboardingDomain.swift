@@ -3,7 +3,7 @@ import Foundation
 enum OnboardingDomain {
     struct Environment {
         let appEnvironment: AppEnvironment
-        let analytics: any AnalyticsService
+        let analytics: AnalyticsService
     }
 
     enum State: Equatable {
@@ -51,6 +51,7 @@ enum OnboardingDomain {
         case delegate(DelegateAction)
     }
 
+    @MainActor
     static func reducer(state: inout State, action: Action, environment: Environment) -> Effect<Action> {
         switch action {
         case .onAppear:

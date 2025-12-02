@@ -1,52 +1,60 @@
 import UIKit
 
 protocol DeviceInfoService {
-    var model: String { get }
+    var deviceArchitecture: String { get }
     var systemVersion: String { get }
-    var name: String { get }
+    var modelName: String { get }
     var identifierForVendor: String { get }
 }
 
 struct LiveDeviceInfoService: DeviceInfoService {
-    var model: String {
-        var systemInfo = utsname()
-        uname(&systemInfo)
-        let machineMirror = Mirror(reflecting: systemInfo.machine)
-        let identifier = machineMirror.children.reduce("") { identifier, element in
-            guard let value = element.value as? Int8, value != 0 else { return identifier }
-            return identifier + String(UnicodeScalar(UInt8(value)))
-        }
-        return identifier
+    let deviceArchitecture: String
+    
+    init() {
+        self.deviceArchitecture = Self.deviceArchitecture()
     }
     
     var systemVersion: String {
         UIDevice.current.systemVersion
     }
     
-    var name: String {
+    var modelName: String {
         UIDevice.current.name
     }
     
     var identifierForVendor: String {
         UIDevice.current.identifierForVendor?.uuidString ?? "Unavailable"
     }
+    
+    private static func deviceArchitecture() -> String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        
+        let identifier = withUnsafePointer(to: &systemInfo.machine) {
+            $0.withMemoryRebound(to: CChar.self, capacity: Int(_SYS_NAMELEN)) {
+                String(cString: $0)
+            }
+        }
+
+        return identifier
+    }
 }
 
 struct MockDeviceInfoService: DeviceInfoService {
-    let model: String
+    let deviceArchitecture: String
     let systemVersion: String
-    let name: String
+    let modelName: String
     let identifierForVendor: String
     
     init(
-        model: String = "iPhone15,3",
+        deviceArchitecture: String = "arm64",
         systemVersion: String = "17.0",
-        name: String = "Preview iPhone",
+        modelName: String = "iPhone15,3",
         identifierForVendor: String = "00000000-0000-0000-0000-000000000000"
     ) {
-        self.model = model
+        self.deviceArchitecture = deviceArchitecture
         self.systemVersion = systemVersion
-        self.name = name
+        self.modelName = modelName
         self.identifierForVendor = identifierForVendor
     }
 }

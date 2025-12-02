@@ -3,8 +3,8 @@ import Foundation
 enum HomeDomain {
     struct Environment {
         let appEnvironment: AppEnvironment
-        let api: any APIService
-        let deviceInfo: any DeviceInfoService
+        let api: APIService
+        let deviceInfo: DeviceInfoService
     }
 
     enum Tab: String, CaseIterable {
@@ -109,6 +109,7 @@ enum HomeDomain {
         case delegate(DelegateAction)
     }
 
+    @MainActor
     static func reducer(state: inout State, action: Action, environment: Environment) -> Effect<Action> {
         switch action {
         case .onAppear:

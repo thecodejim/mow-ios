@@ -27,14 +27,14 @@ enum AppDomain {
         case home(HomeDomain.Action)
         case showLogin
         case showHome
-        case logout
     }
 
+    @MainActor
     static func reducer(state: inout State, action: Action, environment: Environment) -> Effect<Action> {
         switch action {
         // MARK: - Navigation / top-level
 
-        case .showLogin, .logout:
+        case .showLogin:
             state.login = .init()
             state.route = .login
             return .none

@@ -89,16 +89,18 @@ struct HomeRootView: View {
                 debugInfoBinding: debugInfoBinding,
                 isDebugInfoButtonEnabled: store.state.isDebugInfoButtonEnabled,
                 environment: store.environment.appEnvironment,
-                deviceInfo: store.environment.home.deviceInfo
+                deviceInfo: store.environment.deviceInfo
             )
-                .tabItem { Label(HomeDomain.Tab.profile.title, systemImage: HomeDomain.Tab.profile.icon) }
-                .tag(HomeDomain.Tab.profile)
+            .tabItem { Label(HomeDomain.Tab.profile.title, systemImage: HomeDomain.Tab.profile.icon) }
+            .tag(HomeDomain.Tab.profile)
         }
         .overlay {
             if isRefreshing {
                 BusyOverlay(text: "Syncing your routes…")
+                    .transition(.opacity)
             }
         }
+        .animation(.easeInOut, value: isRefreshing)
     }
 }
 
@@ -206,7 +208,7 @@ private struct ProfileView: View {
     let debugInfoBinding: Binding<Bool>
     let isDebugInfoButtonEnabled: Bool
     let environment: AppEnvironment
-    let deviceInfo: any DeviceInfoService
+    let deviceInfo: DeviceInfoService
 
     var body: some View {
         NavigationStack {
@@ -274,7 +276,7 @@ private extension HomeDomain.State {
 
 #Preview {
     @Previewable @StateObject var coordinator: AppCoordinator = {
-        let dependencies = AppDependencies.live(environment: .preview)
+        let dependencies = AppDependencies.mock(environment: .preview)
         let coordinator = AppCoordinator(dependencies: dependencies)
         // Set the initial route to home
         coordinator.store.send(.showHome)

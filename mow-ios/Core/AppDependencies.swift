@@ -17,10 +17,10 @@ protocol AnalyticsService {
 
 struct AppDependencies {
     let environment: AppEnvironment
-    let api: any APIService
-    let keychain: any KeychainService
-    let analytics: any AnalyticsService
-    let deviceInfo: any DeviceInfoService
+    let api: APIService
+    let keychain: KeychainService
+    let analytics: AnalyticsService
+    let deviceInfo: DeviceInfoService
 
     init(
         environment: AppEnvironment,
@@ -43,6 +43,16 @@ struct AppDependencies {
             keychain: MockKeychainService(),
             analytics: MockAnalyticsService(),
             deviceInfo: LiveDeviceInfoService()
+        )
+    }
+    
+    static func mock(environment: AppEnvironment) -> AppDependencies {
+        AppDependencies(
+            environment: environment,
+            api: MockAPIService(),
+            keychain: MockKeychainService(),
+            analytics: MockAnalyticsService(),
+            deviceInfo: MockDeviceInfoService()
         )
     }
 }

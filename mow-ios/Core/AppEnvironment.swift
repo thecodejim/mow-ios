@@ -46,6 +46,32 @@ struct AppEnvironment {
 
     static let current = AppEnvironment()
 
+    init(
+        name: Name,
+        apiBaseURL: URL,
+        docsURL: URL,
+        portalURL: URL,
+        telemetryURL: URL,
+        healthCheckToken: String,
+        featureFlags: FeatureFlags,
+        logLevel: LogLevel,
+        appVersion: String,
+        buildNumber: String,
+        bundleIdentifier: String
+    ) {
+        self.name = name
+        self.apiBaseURL = apiBaseURL
+        self.docsURL = docsURL
+        self.portalURL = portalURL
+        self.telemetryURL = telemetryURL
+        self.healthCheckToken = healthCheckToken
+        self.featureFlags = featureFlags
+        self.logLevel = logLevel
+        self.appVersion = appVersion
+        self.buildNumber = buildNumber
+        self.bundleIdentifier = bundleIdentifier
+    }
+
     init(bundle: Bundle = .main) {
         let info = Info(bundle: bundle)
         let nameRaw = info.string(.environmentName, fallback: Name.localDev.rawValue)
@@ -116,34 +142,6 @@ private extension AppEnvironment {
             }
             return url
         }
-    }
-}
-
-extension AppEnvironment {
-    init(
-        name: Name,
-        apiBaseURL: URL,
-        docsURL: URL,
-        portalURL: URL,
-        telemetryURL: URL,
-        healthCheckToken: String = "preview-token",
-        featureFlags: FeatureFlags = .init(useMockData: true),
-        logLevel: LogLevel = .debug,
-        appVersion: String = "0.0.0",
-        buildNumber: String = "0",
-        bundleIdentifier: String = "com.example.mow.preview"
-    ) {
-        self.name = name
-        self.apiBaseURL = apiBaseURL
-        self.docsURL = docsURL
-        self.portalURL = portalURL
-        self.telemetryURL = telemetryURL
-        self.healthCheckToken = healthCheckToken
-        self.featureFlags = featureFlags
-        self.logLevel = logLevel
-        self.appVersion = appVersion
-        self.buildNumber = buildNumber
-        self.bundleIdentifier = bundleIdentifier
     }
 }
 

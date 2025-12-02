@@ -15,25 +15,42 @@ final class AppCoordinator: ObservableObject {
     init(dependencies: AppDependencies) {
         let environment = AppDomain.Environment(
             appEnvironment: dependencies.environment,
-            onboarding: .init(appEnvironment: dependencies.environment, analytics: dependencies.analytics),
-            login: .init(appEnvironment: dependencies.environment, api: dependencies.api, keychain: dependencies.keychain, analytics: dependencies.analytics, deviceInfo: dependencies.deviceInfo),
-            home: .init(appEnvironment: dependencies.environment, api: dependencies.api, deviceInfo: dependencies.deviceInfo)
+            onboarding: .init(
+                appEnvironment: dependencies.environment,
+                analytics: dependencies.analytics
+            ),
+            login: .init(
+                appEnvironment: dependencies.environment,
+                api: dependencies.api,
+                keychain: dependencies.keychain,
+                analytics: dependencies.analytics,
+                deviceInfo: dependencies.deviceInfo
+            ),
+            home: .init(
+                appEnvironment: dependencies.environment,
+                api: dependencies.api,
+                deviceInfo: dependencies.deviceInfo
+            )
         )
+
         store = Store(initialState: .init(), environment: environment, reducer: AppDomain.reducer)
         route = store.state.route
 
         onboardingStore = store.scope(
             state: { $0.onboarding },
+            environment: { $0.onboarding },
             action: AppDomain.Action.onboarding
         )
 
         loginStore = store.scope(
             state: { $0.login },
+            environment: { $0.login },
             action: AppDomain.Action.login
         )
 
         homeStore = store.scope(
             state: { $0.home },
+            environment: { $0.home },
             action: AppDomain.Action.home
         )
 

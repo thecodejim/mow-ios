@@ -3,10 +3,10 @@ import Foundation
 enum LoginDomain {
     struct Environment {
         let appEnvironment: AppEnvironment
-        let api: any APIService
-        let keychain: any KeychainService
-        let analytics: any AnalyticsService
-        let deviceInfo: any DeviceInfoService
+        let api: APIService
+        let keychain: KeychainService
+        let analytics: AnalyticsService
+        let deviceInfo: DeviceInfoService
     }
 
     enum State: Equatable {
@@ -111,6 +111,7 @@ enum LoginDomain {
         case delegate(DelegateAction)
     }
 
+    @MainActor
     static func reducer(state: inout State, action: Action, environment: Environment) -> Effect<Action> {
         switch action {
         case .onAppear:

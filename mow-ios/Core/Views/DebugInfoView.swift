@@ -4,7 +4,7 @@ struct DebugInfoView: View {
     @Environment(\.dismiss) private var dismiss
     
     let environment: AppEnvironment
-    let deviceInfo: any DeviceInfoService
+    let deviceInfo: DeviceInfoService
     
     var body: some View {
         NavigationStack {
@@ -60,10 +60,13 @@ struct DebugInfoView: View {
     
     private var deviceSection: some View {
         Section {
-            InfoRow(label: "Device", value: deviceInfo.model)
+            InfoRow(label: "Device Architecture", value: deviceInfo.deviceArchitecture)
             InfoRow(label: "iOS Version", value: deviceInfo.systemVersion)
-            InfoRow(label: "Device Name", value: deviceInfo.name)
+            InfoRow(label: "Model Name", value: deviceInfo.modelName)
+            #if DEBUG
             InfoRow(label: "Identifier", value: deviceInfo.identifierForVendor, monospaced: true)
+            #endif
+
         } header: {
             Label("Device", systemImage: "iphone")
         }
@@ -159,9 +162,9 @@ private extension AppEnvironment.Name {
 struct DebugInfoButton: View {
     @Binding private var isPresented: Bool
     let environment: AppEnvironment
-    let deviceInfo: any DeviceInfoService
+    let deviceInfo: DeviceInfoService
     
-    init(isPresented: Binding<Bool>, environment: AppEnvironment, deviceInfo: any DeviceInfoService) {
+    init(isPresented: Binding<Bool>, environment: AppEnvironment, deviceInfo: DeviceInfoService) {
         self._isPresented = isPresented
         self.environment = environment
         self.deviceInfo = deviceInfo

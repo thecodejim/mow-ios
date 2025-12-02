@@ -30,8 +30,10 @@ private struct OnboardingFlowView: View {
             .overlay {
                 if store.state.shouldShowCompletionOverlay {
                     BusyOverlay(text: "Setting things up…")
+                        .transition(.opacity)
                 }
             }
+            .animation(.easeInOut, value: store.state.shouldShowCompletionOverlay)
             .task {
                 store.send(.onAppear)
             }
@@ -65,10 +67,9 @@ private struct OnboardingFlowView: View {
     private var loadedContent: some View {
         VStack(spacing: 24) {
             TabView(selection: selection) {
-                ForEach(store.state.steps) { step in
+                ForEach(Array(store.state.steps.enumerated()), id: \.element.id) { index, step in
                     OnboardingStepCard(step: step)
-                        .tag(step.id)
-                        .padding(.top, 12)
+                        .tag(index)
                 }
             }
             .animation(.spring(response: 0.45, dampingFraction: 0.9), value: store.state.currentIndex)
@@ -205,7 +206,7 @@ private extension OnboardingDomain.State {
 
 #Preview {
     @Previewable @StateObject var coordinator: AppCoordinator = {
-        let dependencies = AppDependencies.live(environment: .preview)
+        let dependencies = AppDependencies.mock(environment: .preview)
         return AppCoordinator(dependencies: dependencies)
     }()
     
