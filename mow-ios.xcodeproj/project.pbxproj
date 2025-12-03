@@ -29,6 +29,12 @@
 		8ECEDBF42ED533EB00A79F73 /* MowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECEDBE52ED533EB00A79F73 /* MowApp.swift */; };
 		8ECEDBF52ED533EB00A79F73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8ECEDBE32ED533EB00A79F73 /* Assets.xcassets */; };
 		8ED2B03A2ED225A00054F396 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 8ED2B0392ED225A00054F396 /* README.md */; };
+		8EF100012FF5000100AAA001 /* LogTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000012FF5000100AAA001 /* LogTypes.swift */; };
+		8EF100022FF5000100AAA001 /* LoggingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000022FF5000100AAA001 /* LoggingConfiguration.swift */; };
+		8EF100032FF5000100AAA001 /* LogDestinations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000032FF5000100AAA001 /* LogDestinations.swift */; };
+		8EF100042FF5000100AAA001 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000042FF5000100AAA001 /* Logger.swift */; };
+		8EF100052FF5000100AAA001 /* LoggingMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000052FF5000100AAA001 /* LoggingMocks.swift */; };
+		8EF100062FF5000100AAA001 /* LogViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000062FF5000100AAA001 /* LogViewerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +70,12 @@
 		8ED2B0722ED377A20054F396 /* LocalDev.secrets.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = LocalDev.secrets.example.xcconfig; sourceTree = "<group>"; };
 		8ED2B0732ED377A20054F396 /* Prod.secrets.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Prod.secrets.example.xcconfig; sourceTree = "<group>"; };
 		8ED2B0742ED377A20054F396 /* Stage.secrets.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Stage.secrets.example.xcconfig; sourceTree = "<group>"; };
+		8EF000012FF5000100AAA001 /* LogTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogTypes.swift; sourceTree = "<group>"; };
+		8EF000022FF5000100AAA001 /* LoggingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingConfiguration.swift; sourceTree = "<group>"; };
+		8EF000032FF5000100AAA001 /* LogDestinations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDestinations.swift; sourceTree = "<group>"; };
+		8EF000042FF5000100AAA001 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		8EF000052FF5000100AAA001 /* LoggingMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingMocks.swift; sourceTree = "<group>"; };
+		8EF000062FF5000100AAA001 /* LogViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +133,7 @@
 			children = (
 				8EC56E652ED6334F00FA6B0F /* DebugInfoView.swift */,
 				8ECEDBD02ED533EB00A79F73 /* BusyOverlay.swift */,
+				8EF000062FF5000100AAA001 /* LogViewerView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -133,9 +146,22 @@
 				8ECEDBD22ED533EB00A79F73 /* AppDependencies.swift */,
 				8ECEDBD32ED533EB00A79F73 /* Store.swift */,
 				8ECEDBD42ED533EB00A79F73 /* StoreScopes.swift */,
+				8EF000102FF5000100AAA001 /* Logging */,
 				8ECEDBD12ED533EB00A79F73 /* Views */,
 			);
 			path = Core;
+			sourceTree = "<group>";
+		};
+		8EF000102FF5000100AAA001 /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				8EF000012FF5000100AAA001 /* LogTypes.swift */,
+				8EF000022FF5000100AAA001 /* LoggingConfiguration.swift */,
+				8EF000032FF5000100AAA001 /* LogDestinations.swift */,
+				8EF000042FF5000100AAA001 /* Logger.swift */,
+				8EF000052FF5000100AAA001 /* LoggingMocks.swift */,
+			);
+			path = Logging;
 			sourceTree = "<group>";
 		};
 		8ECEDBD72ED533EB00A79F73 /* App */ = {
@@ -287,6 +313,7 @@
 				8ECEDBE72ED533EB00A79F73 /* AppCoordinator.swift in Sources */,
 				8ECEDBE82ED533EB00A79F73 /* BusyOverlay.swift in Sources */,
 				8ECEDBE92ED533EB00A79F73 /* AppDependencies.swift in Sources */,
+				8EF100062FF5000100AAA001 /* LogViewerView.swift in Sources */,
 				8EC56E642ED62D8C00FA6B0F /* LoginDomain+Content.swift in Sources */,
 				8ECEDBEA2ED533EB00A79F73 /* Store.swift in Sources */,
 				8ECEDBEB2ED533EB00A79F73 /* StoreScopes.swift in Sources */,
@@ -296,6 +323,11 @@
 				8EC56E622ED6243900FA6B0F /* HomeDomain+Content.swift in Sources */,
 				8ECEDBEF2ED533EB00A79F73 /* LoginDomain.swift in Sources */,
 				8ECEDBF02ED533EB00A79F73 /* LoginViews.swift in Sources */,
+				8EF100012FF5000100AAA001 /* LogTypes.swift in Sources */,
+				8EF100022FF5000100AAA001 /* LoggingConfiguration.swift in Sources */,
+				8EF100032FF5000100AAA001 /* LogDestinations.swift in Sources */,
+				8EF100042FF5000100AAA001 /* Logger.swift in Sources */,
+				8EF100052FF5000100AAA001 /* LoggingMocks.swift in Sources */,
 				8EC56E602ED623D600FA6B0F /* OnboardingDomain+Content.swift in Sources */,
 				8ECEDBF12ED533EB00A79F73 /* OnboardingDomain.swift in Sources */,
 				8ECEDBF22ED533EB00A79F73 /* OnboardingViews.swift in Sources */,

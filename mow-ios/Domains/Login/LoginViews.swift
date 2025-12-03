@@ -117,7 +117,8 @@ private struct LoginScreen: View {
             DebugInfoButton(
                 isPresented: debugInfoBinding,
                 environment: store.environment.appEnvironment,
-                deviceInfo: store.environment.deviceInfo
+                deviceInfo: store.environment.deviceInfo,
+                logHistory: store.environment.logHistory
             )
                 .disabled(!store.state.isDebugInfoButtonEnabled)
                 .frame(maxWidth: .infinity)

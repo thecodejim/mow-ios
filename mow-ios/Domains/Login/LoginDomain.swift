@@ -7,6 +7,8 @@ enum LoginDomain {
         let keychain: KeychainService
         let analytics: AnalyticsService
         let deviceInfo: DeviceInfoService
+        let logger: Logger
+        let logHistory: LogHistoryProviding
     }
 
     enum State: Equatable {
@@ -118,6 +120,11 @@ enum LoginDomain {
             if case .loading = state {
                 state = .loaded(.init())
             }
+            environment.logger.debug(
+                "Login screen appeared",
+                category: .ui,
+                metadata: ["environment": .public(environment.appEnvironment.name.rawValue)]
+            )
             return .fireAndForget {
                 await environment.analytics.track(event: LoginDomain.AnalyticsEvent.loginViewed, metadata: [:])
             }
@@ -149,6 +156,10 @@ enum LoginDomain {
                     message: LoginDomain.Copy.invalidEmail,
                     isShowingDebugInfo: loadedState.isShowingDebugInfo
                 ))
+                environment.logger.info(
+                    "Login validation failed: invalid email",
+                    category: .auth
+                )
                 return .none
             }
 
@@ -158,6 +169,10 @@ enum LoginDomain {
                     message: LoginDomain.Copy.passwordTooShort,
                     isShowingDebugInfo: loadedState.isShowingDebugInfo
                 ))
+                environment.logger.info(
+                    "Login validation failed: password too short",
+                    category: .auth
+                )
                 return .none
             }
 
@@ -166,18 +181,36 @@ enum LoginDomain {
             let email = loadedState.form.email
             let password = loadedState.form.password
             let loginFallbackError = LoginDomain.Copy.loginFallbackError
+            environment.logger.info(
+                "Submitting login request",
+                category: .auth,
+                metadata: ["environment": .public(environment.appEnvironment.name.rawValue)],
+                pii: ["email": .email(email)]
+            )
 
             return .task {
                 do {
                     let session = try await environment.api.login(email: email, password: password)
                     try await environment.keychain.save(token: session.token)
                     await environment.analytics.track(event: LoginDomain.AnalyticsEvent.loginSuccess, metadata: [:])
+                    environment.logger.info(
+                        "Login succeeded",
+                        category: .auth,
+                        metadata: ["displayName": .public(session.displayName)],
+                        pii: ["email": .email(email)]
+                    )
                     return .loginResponse(.success(session))
                 } catch {
                     let message = (error as? LocalizedError)?.errorDescription ?? loginFallbackError
                     await environment.analytics.track(
                         event: LoginDomain.AnalyticsEvent.loginFailure,
                         metadata: ["reason": message]
+                    )
+                    environment.logger.error(
+                        "Login failed",
+                        category: .auth,
+                        metadata: ["reason": .public(message)],
+                        pii: ["email": .email(email)]
                     )
                     return .loginResponse(.failure(.service(message)))
                 }
@@ -205,6 +238,11 @@ enum LoginDomain {
             forgotState.email = resume.form.email
             forgotState.resume = resume
             state = .forgotPassword(forgotState)
+            environment.logger.info(
+                "Forgot password form opened",
+                category: .auth,
+                pii: ["email": .email(forgotState.email)]
+            )
             return .none
 
         case let .forgotEmailChanged(email):
@@ -220,6 +258,10 @@ enum LoginDomain {
             guard forgotState.email.isValidEmail else {
                 forgotState.status = .failure(message: LoginDomain.Copy.forgotInvalidEmail)
                 state = .forgotPassword(forgotState)
+                environment.logger.info(
+                    "Password reset validation failed",
+                    category: .auth
+                )
                 return .none
             }
 
@@ -228,14 +270,30 @@ enum LoginDomain {
 
             let email = forgotState.email
             let resetFallbackError = LoginDomain.Copy.resetFallbackError
+            environment.logger.info(
+                "Sending password reset",
+                category: .auth,
+                pii: ["email": .email(email)]
+            )
 
             return .task {
                 do {
                     try await environment.api.sendPasswordReset(email: email)
                     await environment.analytics.track(event: LoginDomain.AnalyticsEvent.resetRequested, metadata: [:])
+                    environment.logger.info(
+                        "Password reset email sent",
+                        category: .auth,
+                        pii: ["email": .email(email)]
+                    )
                     return .resetResponse(.success)
                 } catch {
                     let message = (error as? LocalizedError)?.errorDescription ?? resetFallbackError
+                    environment.logger.error(
+                        "Password reset failed",
+                        category: .auth,
+                        metadata: ["reason": .public(message)],
+                        pii: ["email": .email(email)]
+                    )
                     return .resetResponse(.failure(.service(message)))
                 }
             }
@@ -256,6 +314,10 @@ enum LoginDomain {
         case .dismissForgot:
             guard case let .forgotPassword(forgotState) = state else { return .none }
             state = .loaded(forgotState.resume)
+            environment.logger.debug(
+                "Dismissed forgot password",
+                category: .ui
+            )
             return .none
 
         case .clearError:
@@ -265,6 +327,11 @@ enum LoginDomain {
 
         case let .setDebugInfoPresented(isPresented):
             state.setDebugInfoPresented(isPresented)
+            environment.logger.debug(
+                "Debug info visibility changed",
+                category: .ui,
+                metadata: ["isPresented": .public(isPresented)]
+            )
             return .none
 
         case .delegate:

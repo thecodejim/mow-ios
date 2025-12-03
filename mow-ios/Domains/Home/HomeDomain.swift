@@ -5,6 +5,8 @@ enum HomeDomain {
         let appEnvironment: AppEnvironment
         let api: APIService
         let deviceInfo: DeviceInfoService
+        let logger: Logger
+        let logHistory: LogHistoryProviding
     }
 
     enum Tab: String, CaseIterable {
@@ -154,6 +156,11 @@ enum HomeDomain {
             }
 
             let refreshFallbackError = HomeDomain.Copy.refreshFallbackError
+            environment.logger.info(
+                "Refreshing home data",
+                category: .businessLogic,
+                metadata: ["environment": .public(environment.appEnvironment.name.rawValue)]
+            )
 
             return .task {
                 do {
@@ -161,6 +168,11 @@ enum HomeDomain {
                     return .refreshResponse(.success(snapshot))
                 } catch {
                     let message = (error as? LocalizedError)?.errorDescription ?? refreshFallbackError
+                    environment.logger.error(
+                        "Home refresh failed",
+                        category: .businessLogic,
+                        metadata: ["reason": .public(message)]
+                    )
                     return .refreshResponse(.failure(.message(message)))
                 }
             }
@@ -189,6 +201,15 @@ enum HomeDomain {
                 loadedState.alertMessage = nil
 
                 state = .loaded(loadedState)
+                environment.logger.info(
+                    "Home refresh succeeded",
+                    category: .businessLogic,
+                    metadata: [
+                        "stats": .public(snapshot.stats.count),
+                        "meals": .public(snapshot.meals.count),
+                        "deliveries": .public(snapshot.deliveries.count)
+                    ]
+                )
 
             case let .failure(error):
                 switch state {
@@ -204,10 +225,19 @@ enum HomeDomain {
                     errorState.message = error.description
                     state = .error(errorState)
                 }
+                environment.logger.info(
+                    "Home refresh error shown",
+                    category: .businessLogic,
+                    metadata: ["message": .public(error.description)]
+                )
             }
             return .none
 
         case .logoutTapped:
+            environment.logger.info(
+                "Logout tapped on home",
+                category: .auth
+            )
             return .send(.delegate(.logout))
 
         case .clearAlert:
@@ -222,6 +252,11 @@ enum HomeDomain {
 
         case let .setDebugInfoPresented(isPresented):
             state.setDebugInfoPresented(isPresented)
+            environment.logger.debug(
+                "Debug info toggled on home",
+                category: .ui,
+                metadata: ["isPresented": .public(isPresented)]
+            )
             return .none
 
         case .delegate:

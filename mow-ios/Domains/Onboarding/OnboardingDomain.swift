@@ -4,6 +4,7 @@ enum OnboardingDomain {
     struct Environment {
         let appEnvironment: AppEnvironment
         let analytics: AnalyticsService
+        let logger: Logger
     }
 
     enum State: Equatable {
@@ -58,6 +59,11 @@ enum OnboardingDomain {
             if case .loading = state {
                 state = .loaded(.init())
             }
+            environment.logger.info(
+                "Onboarding appeared",
+                category: .ui,
+                metadata: ["environment": .public(environment.appEnvironment.name.rawValue)]
+            )
             return .fireAndForget {
                 await environment.analytics.track(
                     event: OnboardingDomain.AnalyticsEvent.viewed,
@@ -73,6 +79,11 @@ enum OnboardingDomain {
             if loadedState.currentIndex < loadedState.steps.count - 1 {
                 loadedState.currentIndex += 1
                 state = .loaded(loadedState)
+                environment.logger.debug(
+                    "Advanced onboarding step",
+                    category: .ui,
+                    metadata: ["currentIndex": .public(loadedState.currentIndex)]
+                )
                 let stepIndex = loadedState.currentIndex
                 return .fireAndForget {
                     await environment.analytics.track(
@@ -83,6 +94,11 @@ enum OnboardingDomain {
             } else {
                 loadedState.isCompleting = true
                 state = .loaded(loadedState)
+                environment.logger.info(
+                    "Completing onboarding",
+                    category: .ui,
+                    metadata: ["totalSteps": .public(loadedState.steps.count)]
+                )
                 return .task {
                     try? await Task.sleep(nanoseconds: 900_000_000)
                     return .finished
@@ -99,6 +115,11 @@ enum OnboardingDomain {
             guard case var .loaded(loadedState) = state, !loadedState.isCompleting else { return .none }
             loadedState.isCompleting = true
             state = .loaded(loadedState)
+            environment.logger.info(
+                "Onboarding skipped",
+                category: .ui,
+                metadata: ["currentIndex": .public(loadedState.currentIndex)]
+            )
             return .task {
                 try? await Task.sleep(nanoseconds: 500_000_000)
                 return .finished
@@ -117,6 +138,11 @@ enum OnboardingDomain {
             guard case var .loaded(loadedState) = state else { return .none }
             loadedState.isCompleting = false
             state = .loaded(loadedState)
+            environment.logger.info(
+                "Onboarding finished",
+                category: .ui,
+                metadata: ["stepsCompleted": .public(loadedState.steps.count)]
+            )
             return .task {
                 await environment.analytics.track(event: OnboardingDomain.AnalyticsEvent.completed, metadata: [:])
                 return .delegate(.finished)

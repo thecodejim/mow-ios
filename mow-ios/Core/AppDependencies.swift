@@ -17,6 +17,8 @@ protocol AnalyticsService {
 
 struct AppDependencies {
     let environment: AppEnvironment
+    let logger: Logger
+    let logHistory: LogHistoryProviding
     let api: APIService
     let keychain: KeychainService
     let analytics: AnalyticsService
@@ -24,12 +26,16 @@ struct AppDependencies {
 
     init(
         environment: AppEnvironment,
-        api: some APIService,
-        keychain: some KeychainService,
-        analytics: some AnalyticsService,
-        deviceInfo: some DeviceInfoService
+        logger: Logger,
+        logHistory: LogHistoryProviding,
+        api: APIService,
+        keychain: KeychainService,
+        analytics: AnalyticsService,
+        deviceInfo: DeviceInfoService
     ) {
         self.environment = environment
+        self.logger = logger
+        self.logHistory = logHistory
         self.api = api
         self.keychain = keychain
         self.analytics = analytics
@@ -37,8 +43,11 @@ struct AppDependencies {
     }
 
     static func live(environment: AppEnvironment) -> AppDependencies {
-        AppDependencies(
+        let logging = LoggingSystem.bootstrap(environment: environment)
+        return AppDependencies(
             environment: environment,
+            logger: logging.logger,
+            logHistory: logging.history,
             api: MockAPIService(),
             keychain: MockKeychainService(),
             analytics: MockAnalyticsService(),
@@ -49,6 +58,8 @@ struct AppDependencies {
     static func mock(environment: AppEnvironment) -> AppDependencies {
         AppDependencies(
             environment: environment,
+            logger: MockLogger(),
+            logHistory: MockLogHistoryProvider(),
             api: MockAPIService(),
             keychain: MockKeychainService(),
             analytics: MockAnalyticsService(),

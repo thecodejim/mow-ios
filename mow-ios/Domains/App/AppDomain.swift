@@ -6,6 +6,7 @@ enum AppDomain {
         let onboarding: OnboardingDomain.Environment
         let login: LoginDomain.Environment
         let home: HomeDomain.Environment
+        let logger: Logger
     }
 
     struct State: Equatable {
@@ -37,11 +38,21 @@ enum AppDomain {
         case .showLogin:
             state.login = .init()
             state.route = .login
+            environment.logger.info(
+                "Routing to login",
+                category: .coordinator,
+                metadata: ["previousRoute": .public(state.route.label)]
+            )
             return .none
 
         case .showHome:
             state.home = .init()
             state.route = .home
+            environment.logger.info(
+                "Routing to home",
+                category: .coordinator,
+                metadata: ["previousRoute": .public(state.route.label)]
+            )
             return .none
 
         // MARK: - Onboarding
@@ -49,6 +60,11 @@ enum AppDomain {
         case .onboarding(.delegate(.finished)):
             state.login = .init()
             state.route = .login
+            environment.logger.info(
+                "Onboarding completed",
+                category: .coordinator,
+                metadata: ["targetRoute": .public(state.route.label)]
+            )
             return .none
 
         case let .onboarding(childAction):
@@ -67,11 +83,21 @@ enum AppDomain {
         case .login(.delegate(.authenticated)):
             state.home = .init()
             state.route = .home
+            environment.logger.info(
+                "Login authenticated",
+                category: .coordinator,
+                metadata: ["targetRoute": .public(state.route.label)]
+            )
             return .none
 
         case .login(.delegate(.logout)):
             state.login = .init()
             state.route = .login
+            environment.logger.info(
+                "User logged out",
+                category: .coordinator,
+                metadata: ["targetRoute": .public(state.route.label)]
+            )
             return .none
 
         case let .login(childAction):
@@ -89,6 +115,11 @@ enum AppDomain {
         case .home(.delegate(.logout)):
             state.login = .init()
             state.route = .login
+            environment.logger.info(
+                "Home requested logout",
+                category: .coordinator,
+                metadata: ["targetRoute": .public(state.route.label)]
+            )
             return .none
 
         case let .home(childAction):
@@ -100,6 +131,16 @@ enum AppDomain {
                 environment: environment.home
             )
             return effect.map(Action.home)
+        }
+    }
+}
+
+private extension AppDomain.State.Route {
+    var label: String {
+        switch self {
+        case .onboarding: return "onboarding"
+        case .login: return "login"
+        case .home: return "home"
         }
     }
 }

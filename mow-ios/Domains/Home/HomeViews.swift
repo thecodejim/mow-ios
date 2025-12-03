@@ -89,7 +89,8 @@ struct HomeRootView: View {
                 debugInfoBinding: debugInfoBinding,
                 isDebugInfoButtonEnabled: store.state.isDebugInfoButtonEnabled,
                 environment: store.environment.appEnvironment,
-                deviceInfo: store.environment.deviceInfo
+                deviceInfo: store.environment.deviceInfo,
+                logHistory: store.environment.logHistory
             )
             .tabItem { Label(HomeDomain.Tab.profile.title, systemImage: HomeDomain.Tab.profile.icon) }
             .tag(HomeDomain.Tab.profile)
@@ -209,6 +210,7 @@ private struct ProfileView: View {
     let isDebugInfoButtonEnabled: Bool
     let environment: AppEnvironment
     let deviceInfo: DeviceInfoService
+    let logHistory: LogHistoryProviding
 
     var body: some View {
         NavigationStack {
@@ -233,7 +235,12 @@ private struct ProfileView: View {
             .navigationTitle("Profile")
             .safeAreaInset(edge: .bottom) {
                 VStack(spacing: 8) {
-                    DebugInfoButton(isPresented: debugInfoBinding, environment: environment, deviceInfo: deviceInfo)
+                    DebugInfoButton(
+                        isPresented: debugInfoBinding,
+                        environment: environment,
+                        deviceInfo: deviceInfo,
+                        logHistory: logHistory
+                    )
                         .disabled(!isDebugInfoButtonEnabled)
                         .frame(maxWidth: .infinity)
                 }

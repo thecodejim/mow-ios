@@ -5,6 +5,7 @@ struct DebugInfoView: View {
     
     let environment: AppEnvironment
     let deviceInfo: DeviceInfoService
+    let logHistory: LogHistoryProviding
     
     var body: some View {
         NavigationStack {
@@ -14,6 +15,7 @@ struct DebugInfoView: View {
                 featureFlagsSection
                 deviceSection
                 appSection
+                diagnosticsSection
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Debug Info")
@@ -81,7 +83,18 @@ struct DebugInfoView: View {
             Label("App", systemImage: "app.badge")
         }
     }
-    
+    private var diagnosticsSection: some View {
+        Section {
+            NavigationLink {
+                LogViewerView(logHistory: logHistory)
+            } label: {
+                Label("View Logs", systemImage: "doc.richtext")
+            }
+        } header: {
+            Label("Diagnostics", systemImage: "terminal")
+        }
+    }
+
     // MARK: - Helpers
     
     private func maskedToken(_ token: String) -> String {
@@ -163,11 +176,13 @@ struct DebugInfoButton: View {
     @Binding private var isPresented: Bool
     let environment: AppEnvironment
     let deviceInfo: DeviceInfoService
+    let logHistory: LogHistoryProviding
     
-    init(isPresented: Binding<Bool>, environment: AppEnvironment, deviceInfo: DeviceInfoService) {
+    init(isPresented: Binding<Bool>, environment: AppEnvironment, deviceInfo: DeviceInfoService, logHistory: LogHistoryProviding) {
         self._isPresented = isPresented
         self.environment = environment
         self.deviceInfo = deviceInfo
+        self.logHistory = logHistory
     }
     
     var body: some View {
@@ -182,11 +197,11 @@ struct DebugInfoButton: View {
             .foregroundStyle(.secondary)
         }
         .sheet(isPresented: $isPresented) {
-            DebugInfoView(environment: environment, deviceInfo: deviceInfo)
+            DebugInfoView(environment: environment, deviceInfo: deviceInfo, logHistory: logHistory)
         }
     }
 }
 
 #Preview {
-    DebugInfoView(environment: .preview, deviceInfo: MockDeviceInfoService())
+    DebugInfoView(environment: .preview, deviceInfo: MockDeviceInfoService(), logHistory: MockLogHistoryProvider())
 }

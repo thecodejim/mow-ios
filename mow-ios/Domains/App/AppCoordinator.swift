@@ -17,20 +17,26 @@ final class AppCoordinator: ObservableObject {
             appEnvironment: dependencies.environment,
             onboarding: .init(
                 appEnvironment: dependencies.environment,
-                analytics: dependencies.analytics
+                analytics: dependencies.analytics,
+                logger: dependencies.logger
             ),
             login: .init(
                 appEnvironment: dependencies.environment,
                 api: dependencies.api,
                 keychain: dependencies.keychain,
                 analytics: dependencies.analytics,
-                deviceInfo: dependencies.deviceInfo
+                deviceInfo: dependencies.deviceInfo,
+                logger: dependencies.logger,
+                logHistory: dependencies.logHistory
             ),
             home: .init(
                 appEnvironment: dependencies.environment,
                 api: dependencies.api,
-                deviceInfo: dependencies.deviceInfo
-            )
+                deviceInfo: dependencies.deviceInfo,
+                logger: dependencies.logger,
+                logHistory: dependencies.logHistory
+            ),
+            logger: dependencies.logger
         )
 
         store = Store(initialState: .init(), environment: environment, reducer: AppDomain.reducer)
