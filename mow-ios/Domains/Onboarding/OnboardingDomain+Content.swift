@@ -1,3 +1,5 @@
+import Foundation
+
 extension OnboardingDomain {
     enum AnalyticsEvent {
         static let viewed = "onboarding_viewed"
@@ -9,31 +11,79 @@ extension OnboardingDomain {
         static let environment = "environment"
         static let step = "step"
     }
+
+    enum Copy {
+        fileprivate enum Key {
+            static let loadingTitle = "onboarding.loading.title"
+            static let completionOverlay = "onboarding.completion.overlay"
+            static let retryButton = "onboarding.error.retry"
+            static let skipButton = "onboarding.actions.skip"
+            static let backButton = "onboarding.actions.back"
+            static let nextButton = "onboarding.actions.next"
+            static let launchButton = "onboarding.actions.launch"
+
+            static let stepPlanTitle = "onboarding.steps.plan.title"
+            static let stepPlanMessage = "onboarding.steps.plan.message"
+            static let stepPlanDetail = "onboarding.steps.plan.detail"
+
+            static let stepSyncTitle = "onboarding.steps.sync.title"
+            static let stepSyncMessage = "onboarding.steps.sync.message"
+            static let stepSyncDetail = "onboarding.steps.sync.detail"
+
+            static let stepConfidenceTitle = "onboarding.steps.confidence.title"
+            static let stepConfidenceMessage = "onboarding.steps.confidence.message"
+            static let stepConfidenceDetail = "onboarding.steps.confidence.detail"
+        }
+
+        static var loadingTitle: String { localized(Key.loadingTitle) }
+        static var completionOverlayMessage: String { localized(Key.completionOverlay) }
+        static var retryButtonTitle: String { localized(Key.retryButton) }
+        static var skipButtonTitle: String { localized(Key.skipButton) }
+        static var backButtonTitle: String { localized(Key.backButton) }
+        static var nextButtonTitle: String { localized(Key.nextButton) }
+        static var launchButtonTitle: String { localized(Key.launchButton) }
+
+        static var stepPlanTitle: String { localized(Key.stepPlanTitle) }
+        static var stepPlanMessage: String { localized(Key.stepPlanMessage) }
+        static var stepPlanDetail: String { localized(Key.stepPlanDetail) }
+
+        static var stepSyncTitle: String { localized(Key.stepSyncTitle) }
+        static var stepSyncMessage: String { localized(Key.stepSyncMessage) }
+        static var stepSyncDetail: String { localized(Key.stepSyncDetail) }
+
+        static var stepConfidenceTitle: String { localized(Key.stepConfidenceTitle) }
+        static var stepConfidenceMessage: String { localized(Key.stepConfidenceMessage) }
+        static var stepConfidenceDetail: String { localized(Key.stepConfidenceDetail) }
+
+        private static func localized(_ key: String) -> String {
+            NSLocalizedString(key, bundle: .main, comment: "")
+        }
+    }
 }
 
 extension OnboardingDomain.State.Step {
     static let catalog: [Self] = [
         .init(
             id: 0,
-            title: "Plan your day",
-            message: "Line up routes, meals, and reminders in one place.",
-            detail: "We load your territory, favorite recipients, and notes so you can focus on deliveries.",
+            title: OnboardingDomain.Copy.stepPlanTitle,
+            message: OnboardingDomain.Copy.stepPlanMessage,
+            detail: OnboardingDomain.Copy.stepPlanDetail,
             icon: "calendar.badge.clock",
             accent: .mint
         ),
         .init(
             id: 1,
-            title: "Stay in sync",
-            message: "Coordinators see your status in real time.",
-            detail: "Push updates to dispatch with a single tap when traffic or weather gets in the way.",
+            title: OnboardingDomain.Copy.stepSyncTitle,
+            message: OnboardingDomain.Copy.stepSyncMessage,
+            detail: OnboardingDomain.Copy.stepSyncDetail,
             icon: "point.3.connected.trianglepath.dotted",
             accent: .orange
         ),
         .init(
             id: 2,
-            title: "Deliver with confidence",
-            message: "Meals, dietary notes, and wellness flags travel with you.",
-            detail: "Every household profile highlights what matters most before you knock.",
+            title: OnboardingDomain.Copy.stepConfidenceTitle,
+            message: OnboardingDomain.Copy.stepConfidenceMessage,
+            detail: OnboardingDomain.Copy.stepConfidenceDetail,
             icon: "heart.text.square",
             accent: .blue
         )

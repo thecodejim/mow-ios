@@ -29,7 +29,7 @@ private struct OnboardingFlowView: View {
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .overlay {
                 if store.state.shouldShowCompletionOverlay {
-                    BusyOverlay(text: "Setting things up…")
+                    BusyOverlay(text: OnboardingDomain.Copy.completionOverlayMessage)
                         .transition(.opacity)
                 }
             }
@@ -43,7 +43,9 @@ private struct OnboardingFlowView: View {
     private var content: some View {
         switch store.state {
         case .loading:
-            ProgressView("Loading…")
+            ProgressView {
+                Text(OnboardingDomain.Copy.loadingTitle)
+            }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         case let .error(errorState):
             VStack(spacing: 16) {
@@ -53,8 +55,10 @@ private struct OnboardingFlowView: View {
                 Text(errorState.message)
                     .font(.headline)
                     .multilineTextAlignment(.center)
-                Button("Try again") {
+                Button {
                     store.send(.onAppear)
+                } label: {
+                    Text(OnboardingDomain.Copy.retryButtonTitle)
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -156,21 +160,27 @@ private struct OnboardingActionBar: View {
     var body: some View {
         HStack(spacing: 16) {
             if !isFinalStep {
-                Button("Skip") {
+                Button {
                     onSkip()
+                } label: {
+                    Text(OnboardingDomain.Copy.skipButtonTitle)
                 }
                 .buttonStyle(.borderless)
                 .disabled(isBusy)
             }
 
-            Button("Back") {
+            Button {
                 onBack()
+            } label: {
+                Text(OnboardingDomain.Copy.backButtonTitle)
             }
             .buttonStyle(.bordered)
             .disabled(!canGoBack || isBusy)
 
-            Button(isFinalStep ? "Let's go" : "Next") {
+            Button {
                 onPrimary()
+            } label: {
+                Text(isFinalStep ? OnboardingDomain.Copy.launchButtonTitle : OnboardingDomain.Copy.nextButtonTitle)
             }
             .buttonStyle(.borderedProminent)
             .disabled(isBusy)
@@ -211,4 +221,5 @@ private extension OnboardingDomain.State {
     }()
     
     OnboardingRootView(store: coordinator.onboardingStore)
+        .environment(\.locale, .init(identifier: "es"))
 }

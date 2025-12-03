@@ -1,6 +1,435 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ • %@ • %@:%llu" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ • %2$@ • %3$@:%4$llu"
+          }
+        }
+      }
+    },
+    "%@ mi" : {
+
+    },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%lld calories • %@ delivery" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld calories • %2$@ delivery"
+          }
+        }
+      }
+    },
+    "App" : {
+
+    },
+    "Debug Info" : {
+
+    },
+    "Deliveries" : {
+
+    },
+    "Device" : {
+
+    },
+    "Diagnostics" : {
+
+    },
+    "Done" : {
+
+    },
+    "Email" : {
+
+    },
+    "Endpoints" : {
+
+    },
+    "Environment" : {
+
+    },
+    "Export Failed" : {
+
+    },
+    "Export logs" : {
+
+    },
+    "Feature Flags" : {
+
+    },
+    "Forgot password" : {
+
+    },
+    "Forgot password?" : {
+
+    },
+    "Heads up" : {
+
+    },
+    "Hide" : {
+
+    },
+    "Interact with the app and recent logs will show up here." : {
+
+    },
+    "Loading your day…" : {
+
+    },
+    "Log out" : {
+
+    },
+    "Logging out clears cached credentials stored in the secure enclave." : {
+
+    },
+    "Logs" : {
+
+    },
+    "Meals" : {
+
+    },
+    "Name" : {
+
+    },
+    "name@email.com" : {
+
+    },
+    "No logs yet" : {
+
+    },
+    "onboarding.actions.back" : {
+      "comment" : "Label for the back button in onboarding",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atrás"
+          }
+        }
+      }
+    },
+    "onboarding.actions.launch" : {
+      "comment" : "Primary button text on the final onboarding step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Let's go"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vamos"
+          }
+        }
+      }
+    },
+    "onboarding.actions.next" : {
+      "comment" : "Primary button text for advancing onboarding steps",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siguiente"
+          }
+        }
+      }
+    },
+    "onboarding.actions.skip" : {
+      "comment" : "Button text that lets the user skip onboarding",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omitir"
+          }
+        }
+      }
+    },
+    "onboarding.completion.overlay" : {
+      "comment" : "Message shown while onboarding completes background tasks",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setting things up…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparando todo…"
+          }
+        }
+      }
+    },
+    "onboarding.error.retry" : {
+      "comment" : "Button text for retrying onboarding after an error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try again"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intentar de nuevo"
+          }
+        }
+      }
+    },
+    "onboarding.loading.title" : {
+      "comment" : "Loading text shown while onboarding initializes",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargando…"
+          }
+        }
+      }
+    },
+    "onboarding.steps.confidence.detail" : {
+      "comment" : "Detail text for the confidence onboarding step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every household profile highlights what matters most before you knock."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada perfil de hogar resalta lo que más importa antes de tocar la puerta."
+          }
+        }
+      }
+    },
+    "onboarding.steps.confidence.message" : {
+      "comment" : "Message text for the confidence onboarding step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meals, dietary notes, and wellness flags travel with you."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las comidas, notas dietéticas y alertas de bienestar viajan contigo."
+          }
+        }
+      }
+    },
+    "onboarding.steps.confidence.title" : {
+      "comment" : "Title for the confidence onboarding step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deliver with confidence"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrega con confianza"
+          }
+        }
+      }
+    },
+    "onboarding.steps.plan.detail" : {
+      "comment" : "Detail text for the plan your day onboarding step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We load your territory, favorite recipients, and notes so you can focus on deliveries."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cargamos tu territorio, destinatarios favoritos y notas para que puedas enfocarte en las entregas."
+          }
+        }
+      }
+    },
+    "onboarding.steps.plan.message" : {
+      "comment" : "Message text for the plan your day onboarding step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Line up routes, meals, and reminders in one place."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Organiza rutas, comidas y recordatorios en un solo lugar."
+          }
+        }
+      }
+    },
+    "onboarding.steps.plan.title" : {
+      "comment" : "Title for the plan your day onboarding step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan your day"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planifica tu día"
+          }
+        }
+      }
+    },
+    "onboarding.steps.sync.detail" : {
+      "comment" : "Detail text for the stay in sync onboarding step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Push updates to dispatch with a single tap when traffic or weather gets in the way."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envía actualizaciones a despacho con un solo toque cuando el tráfico o el clima se interpongan."
+          }
+        }
+      }
+    },
+    "onboarding.steps.sync.message" : {
+      "comment" : "Message text for the stay in sync onboarding step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coordinators see your status in real time."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los coordinadores ven tu estado en tiempo real."
+          }
+        }
+      }
+    },
+    "onboarding.steps.sync.title" : {
+      "comment" : "Title for the stay in sync onboarding step",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stay in sync"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantente sincronizado"
+          }
+        }
+      }
+    },
+    "Password" : {
+
+    },
+    "PII" : {
+
+    },
+    "Plan" : {
+
+    },
+    "Profile" : {
+
+    },
+    "Role" : {
+
+    },
+    "Search message or metadata" : {
+
+    },
+    "Send reset link" : {
+
+    },
+    "Show" : {
+
+    },
+    "Sign in" : {
+
+    },
+    "Sign in to get rolling on today's deliveries." : {
+
+    },
+    "Territory" : {
+
+    },
     "test" : {
       "comment" : "test",
       "extractionState" : "manual",
@@ -18,6 +447,28 @@
           }
         }
       }
+    },
+    "Try again" : {
+
+    },
+    "v%@ • %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "v%1$@ • %2$@"
+          }
+        }
+      }
+    },
+    "View Logs" : {
+
+    },
+    "Volunteer" : {
+
+    },
+    "Welcome back" : {
+
     }
   },
   "version" : "1.1"
