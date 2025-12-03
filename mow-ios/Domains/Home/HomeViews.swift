@@ -26,7 +26,7 @@ struct HomeRootView: View {
                 store.send(.onAppear)
             }
             .alert(
-                "Heads up",
+                HomeDomain.Copy.alertTitle,
                 isPresented: Binding(
                     get: { store.state.alertMessage != nil },
                     set: { if !$0 { store.send(.clearAlert) } }
@@ -42,7 +42,9 @@ struct HomeRootView: View {
     private var content: some View {
         switch store.state {
         case .loading:
-            ProgressView("Loading your day…")
+            ProgressView {
+                Text(HomeDomain.Copy.loadingTitle)
+            }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         case let .error(errorState):
             VStack(spacing: 16) {
@@ -52,8 +54,10 @@ struct HomeRootView: View {
                 Text(errorState.message)
                     .font(.headline)
                     .multilineTextAlignment(.center)
-                Button("Try again") {
+                Button {
                     store.send(.refresh)
+                } label: {
+                    Text(HomeDomain.Copy.retryButtonTitle)
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -97,7 +101,7 @@ struct HomeRootView: View {
         }
         .overlay {
             if isRefreshing {
-                BusyOverlay(text: "Syncing your routes…")
+                BusyOverlay(text: HomeDomain.Copy.refreshOverlayMessage)
                     .transition(.opacity)
             }
         }
@@ -137,7 +141,7 @@ private struct DashboardView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Plan")
+            .navigationTitle(HomeDomain.Tab.dashboard.title)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -164,14 +168,14 @@ private struct MealsView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(meal.title)
                         .font(.headline)
-                    Text("\(meal.calories) calories • \(meal.deliveryTime.formatted(date: .omitted, time: .shortened)) delivery")
+                    Text(HomeDomain.Copy.mealMetadata(calories: meal.calories, deliveryTime: meal.deliveryTime))
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 6)
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Meals")
+            .navigationTitle(HomeDomain.Tab.meals.title)
         }
     }
 }
@@ -191,14 +195,14 @@ private struct DeliveriesView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Text("\(stop.distance, format: .number.precision(.fractionLength(1))) mi")
+                    Text(HomeDomain.Copy.deliveryDistance(stop.distance))
                         .font(.footnote.monospacedDigit())
                         .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 4)
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Deliveries")
+            .navigationTitle(HomeDomain.Tab.deliveries.title)
         }
     }
 }
@@ -215,24 +219,24 @@ private struct ProfileView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Volunteer") {
-                    LabeledContent("Name", value: profile.name)
-                    LabeledContent("Role", value: profile.role)
-                    LabeledContent("Territory", value: profile.territory)
+                Section(HomeDomain.Copy.volunteerSectionTitle) {
+                    LabeledContent(HomeDomain.Copy.nameLabel, value: profile.name)
+                    LabeledContent(HomeDomain.Copy.roleLabel, value: profile.role)
+                    LabeledContent(HomeDomain.Copy.territoryLabel, value: profile.territory)
                 }
 
                 Section {
                     Button(role: .destructive) {
                         onLogout()
                     } label: {
-                        Text("Log out")
+                        Text(HomeDomain.Copy.logoutButtonTitle)
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
                 } footer: {
-                    Text("Logging out clears cached credentials stored in the secure enclave.")
+                    Text(HomeDomain.Copy.logoutFooterText)
                 }
             }
-            .navigationTitle("Profile")
+            .navigationTitle(HomeDomain.Tab.profile.title)
             .safeAreaInset(edge: .bottom) {
                 VStack(spacing: 8) {
                     DebugInfoButton(
@@ -291,4 +295,5 @@ private extension HomeDomain.State {
     }()
     
     HomeRootView(store: coordinator.homeStore)
+        .environment(\.locale, .init(identifier: "es"))
 }
