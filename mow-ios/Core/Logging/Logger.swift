@@ -19,6 +19,7 @@ protocol Logger: Sendable {
         pii: [String: PIIValue]
     ) -> Logger
 
+    // flush() is a best effort not a guarantee
     func flush() async
 }
 
@@ -90,6 +91,23 @@ extension Logger {
         line: UInt = #line
     ) {
         log(level: .critical, message(), category: category, metadata: metadata, pii: pii, file: file, function: function, line: line)
+    }
+}
+
+extension Logger {
+    func error(
+        _ message: @autoclosure () -> String,
+        error: Error,
+        category: LogCategory = .app,
+        metadata: LogMetadataFields = [:],
+        pii: [String: PIIValue] = [:],
+        file: StaticString = #fileID,
+        function: StaticString = #function,
+        line: UInt = #line
+    ) {
+        var meta = metadata
+        meta["error"] = .public(String(describing: error))
+        self.error(message(), category: category, metadata: meta, pii: pii, file: file, function: function, line: line)
     }
 }
 
@@ -287,7 +305,7 @@ enum LoggingSystem {
         if configuration.destinations.console.isEnabled {
             let console = ConsoleLogDestination(
                 subsystem: environment.bundleIdentifier,
-                colorized: configuration.destinations.console.colorized
+                showIcon: configuration.destinations.console.showIcon
             )
             destinations.append(console)
         }

@@ -110,6 +110,9 @@ enum LogValue: Codable, Sendable {
                 if let value = try? arrayContainer.decode(LogValue.self) {
                     values.append(value)
                 } else {
+                    #if DEBUG
+                        print("LogValue: skipping malformed element")
+                    #endif
                     arrayContainer.skip()
                 }
             }
@@ -319,6 +322,7 @@ struct PIIValue: Sendable, Equatable {
         return LogPIIRepresentation(kind: kind, redacted: redacted, hash: hash)
     }
 
+    // single char emails, e.g. a@email.com will not be masked
     private static func maskEmail(_ email: String) -> String {
         guard let atIndex = email.firstIndex(of: "@") else {
             return maskGeneric(email)
@@ -337,6 +341,7 @@ struct PIIValue: Sendable, Equatable {
         return String(repeating: "•", count: digits.count - 4) + suffix
     }
 
+    // single char names, e.g. 'H' will not be masked
     private static func maskName(_ name: String) -> String {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let first = trimmed.first else { return "" }

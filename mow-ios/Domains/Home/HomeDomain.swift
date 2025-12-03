@@ -170,6 +170,7 @@ enum HomeDomain {
                     let message = (error as? LocalizedError)?.errorDescription ?? refreshFallbackError
                     environment.logger.error(
                         "Home refresh failed",
+                        error: error,
                         category: .businessLogic,
                         metadata: ["reason": .public(message)]
                     )

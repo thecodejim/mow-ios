@@ -10,18 +10,18 @@ protocol LogDestination: Sendable {
 
 final class ConsoleLogDestination: LogDestination {
     private let subsystem: String
-    private let colorized: Bool
+    private let showIcon: Bool
     private let logger: os.Logger
     private let formatter = ConsoleLogFormatter()
 
-    init(subsystem: String, colorized: Bool) {
+    init(subsystem: String, showIcon: Bool) {
         self.subsystem = subsystem
-        self.colorized = colorized
+        self.showIcon = showIcon
         self.logger = os.Logger(subsystem: subsystem, category: "app")
     }
 
     func write(_ entry: LogEntry) async {
-        let payload = formatter.render(entry: entry, colorized: colorized)
+        let payload = formatter.render(entry: entry, showIcon: showIcon)
         logger.log(level: entry.osLogType, "\(payload, privacy: .public)")
     }
 
@@ -36,11 +36,11 @@ private struct ConsoleLogFormatter {
         return formatter
     }()
 
-    func render(entry: LogEntry, colorized: Bool) -> String {
+    func render(entry: LogEntry, showIcon: Bool) -> String {
         let timestamp = timestampFormatter.string(from: entry.timestamp)
         let metadata = ConsoleLogFormatter.metadataString(from: entry.metadata, scope: entry.scope)
         let piiNote = entry.pii.isEmpty ? "" : " pii:\(entry.pii.keys.joined(separator: ","))"
-        if colorized {
+        if showIcon {
             return "\(entry.level.icon) [\(timestamp)] [\(entry.level.label)] [\(entry.category.rawValue)] \(entry.message)\(metadata)\(piiNote)"
         } else {
             return "[\(timestamp)] [\(entry.level.label)] [\(entry.category.rawValue)] \(entry.message)\(metadata)\(piiNote)"
@@ -91,6 +91,8 @@ private extension LogEntry {
 actor FileLogDestination: LogDestination {
     private let directoryURL: URL
     private let config: LoggingConfiguration.DestinationConfiguration.File
+    // Note: fileHandle is kept open for the lifetime of this destination.
+    // It is closed on rotation and when the actor is deallocated.
     private var fileHandle: FileHandle?
 
     init(baseDirectory: URL, config: LoggingConfiguration.DestinationConfiguration.File) {
@@ -162,10 +164,14 @@ actor FileLogDestination: LogDestination {
         FileManager.default.createFile(atPath: activeFileURL.path, contents: nil)
         fileHandle = try FileHandle(forUpdating: activeFileURL)
     }
-
-    private func encode(_ entry: LogEntry) throws -> Data {
+    
+    private let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.withoutEscapingSlashes]
+        return encoder
+    }()
+
+    private func encode(_ entry: LogEntry) throws -> Data {
         return try encoder.encode(EncodableLogEntry(entry: entry))
     }
 

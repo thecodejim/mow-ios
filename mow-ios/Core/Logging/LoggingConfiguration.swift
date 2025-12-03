@@ -4,13 +4,13 @@ struct LoggingConfiguration: Sendable {
     struct DestinationConfiguration: Sendable {
         struct Console: Sendable {
             let isEnabled: Bool
-            let colorized: Bool
+            let showIcon: Bool
         }
 
         struct File: Sendable {
             let isEnabled: Bool
             let maxFileBytes: Int
-            let maxFiles: Int
+            let maxFiles: Int // max rotated archives - active file will be +1
             let directoryName: String
         }
 
@@ -95,7 +95,7 @@ extension AppEnvironment {
         switch name {
         case .localDev:
             return .init(
-                console: .init(isEnabled: true, colorized: true),
+                console: .init(isEnabled: true, showIcon: true),
                 file: .init(
                     isEnabled: false,
                     maxFileBytes: 5 * 1_024 * 1_024,
@@ -106,7 +106,7 @@ extension AppEnvironment {
             )
         case .stage:
             return .init(
-                console: .init(isEnabled: false, colorized: false),
+                console: .init(isEnabled: false, showIcon: false),
                 file: .init(
                     isEnabled: true,
                     maxFileBytes: 5 * 1_024 * 1_024,
@@ -117,7 +117,7 @@ extension AppEnvironment {
             )
         case .prod:
             return .init(
-                console: .init(isEnabled: false, colorized: false),
+                console: .init(isEnabled: false, showIcon: false),
                 file: .init(
                     isEnabled: true,
                     maxFileBytes: 5 * 1_024 * 1_024,

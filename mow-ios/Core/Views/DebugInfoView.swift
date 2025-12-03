@@ -88,7 +88,7 @@ struct DebugInfoView: View {
             NavigationLink {
                 LogViewerView(logHistory: logHistory)
             } label: {
-                Label("View Logs", systemImage: "doc.richtext")
+                Text("View Logs")
             }
         } header: {
             Label("Diagnostics", systemImage: "terminal")

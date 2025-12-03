@@ -208,6 +208,7 @@ enum LoginDomain {
                     )
                     environment.logger.error(
                         "Login failed",
+                        error: error,
                         category: .auth,
                         metadata: ["reason": .public(message)],
                         pii: ["email": .email(email)]
@@ -290,6 +291,7 @@ enum LoginDomain {
                     let message = (error as? LocalizedError)?.errorDescription ?? resetFallbackError
                     environment.logger.error(
                         "Password reset failed",
+                        error: error,
                         category: .auth,
                         metadata: ["reason": .public(message)],
                         pii: ["email": .email(email)]
