@@ -43,15 +43,15 @@ private struct LoginScreen: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Welcome back")
+                Text(LoginDomain.Copy.welcomeTitle)
                     .font(.largeTitle.bold())
-                Text("Sign in to get rolling on today's deliveries.")
+                Text(LoginDomain.Copy.welcomeSubtitle)
                     .font(.body)
                     .foregroundStyle(.secondary)
             }
 
             VStack(spacing: 18) {
-                TextField("Email", text: Binding(
+                TextField(LoginDomain.Copy.emailFieldPlaceholder, text: Binding(
                     get: { store.state.loginForm.email },
                     set: { store.send(.emailChanged($0)) }
                 ))
@@ -63,20 +63,20 @@ private struct LoginScreen: View {
 
                 ZStack(alignment: .trailing) {
                     if store.state.loginForm.isSecureEntry {
-                        SecureField("Password", text: Binding(
+                        SecureField(LoginDomain.Copy.passwordFieldPlaceholder, text: Binding(
                             get: { store.state.loginForm.password },
                             set: { store.send(.passwordChanged($0)) }
                         ))
                         .textContentType(.password)
                     } else {
-                        TextField("Password", text: Binding(
+                        TextField(LoginDomain.Copy.passwordFieldPlaceholder, text: Binding(
                             get: { store.state.loginForm.password },
                             set: { store.send(.passwordChanged($0)) }
                         ))
                         .textContentType(.password)
                     }
 
-                    Button(store.state.loginForm.isSecureEntry ? "Show" : "Hide") {
+                    Button(store.state.loginForm.isSecureEntry ? LoginDomain.Copy.showPasswordTitle : LoginDomain.Copy.hidePasswordTitle) {
                         store.send(.toggleSecureEntry)
                     }
                     .font(.caption.bold())
@@ -93,7 +93,7 @@ private struct LoginScreen: View {
                 }
             }
 
-            Button("Forgot password?") {
+            Button(LoginDomain.Copy.forgotPasswordButtonTitle) {
                 store.send(.forgotPasswordTapped)
             }
             .font(.footnote.weight(.semibold))
@@ -103,7 +103,7 @@ private struct LoginScreen: View {
             } label: {
                 HStack {
                     Spacer()
-                    Text("Sign in")
+                    Text(LoginDomain.Copy.signInButtonTitle)
                         .font(.headline)
                     Spacer()
                 }
@@ -128,7 +128,7 @@ private struct LoginScreen: View {
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .overlay {
             if store.state.isSubmitting {
-                BusyOverlay(text: "Checking your credentials…")
+                BusyOverlay(text: LoginDomain.Copy.submittingOverlayMessage)
                     .transition(.opacity)
             }
         }
@@ -155,8 +155,8 @@ private struct ForgotPasswordView: View {
     var body: some View {
         let forgotState = store.state.forgotState
         Form {
-            Section("Email") {
-                TextField("name@email.com", text: Binding(
+            Section(LoginDomain.Copy.emailSectionTitle) {
+                TextField(LoginDomain.Copy.emailSamplePlaceholder, text: Binding(
                     get: { forgotState.email },
                     set: { store.send(.forgotEmailChanged($0)) }
                 ))
@@ -165,7 +165,7 @@ private struct ForgotPasswordView: View {
             }
 
             Section {
-                Button("Send reset link") {
+                Button(LoginDomain.Copy.sendResetButtonTitle) {
                     store.send(.sendReset)
                 }
                 .disabled(store.state.isSendingReset)
@@ -187,11 +187,11 @@ private struct ForgotPasswordView: View {
                 }
             }
         }
-        .navigationTitle("Forgot password")
+        .navigationTitle(LoginDomain.Copy.forgotPasswordNavigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .overlay {
             if store.state.isSendingReset {
-                BusyOverlay(text: "Sending instructions…")
+                BusyOverlay(text: LoginDomain.Copy.resetOverlayMessage)
             }
         }
     }
@@ -266,4 +266,5 @@ private extension LoginDomain.State {
     }()
     
     LoginRootView(store: coordinator.loginStore)
+//        .environment(\.locale, .init(identifier: "es"))
 }

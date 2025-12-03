@@ -1,6 +1,366 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "login.cta.forgotPassword" : {
+      "comment" : "Button that opens the forgot password flow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot password?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Olvidaste tu contraseña?"
+          }
+        }
+      }
+    },
+    "login.cta.signIn" : {
+      "comment" : "Primary button text to submit login form",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar sesión"
+          }
+        }
+      }
+    },
+    "login.error.fallback" : {
+      "comment" : "Fallback message when login request fails",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We hit a snag signing you in."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tuvimos un problema al iniciar tu sesión."
+          }
+        }
+      }
+    },
+    "login.error.invalidEmail" : {
+      "comment" : "Validation error shown when email is invalid",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please enter a valid email."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresa un correo electrónico válido."
+          }
+        }
+      }
+    },
+    "login.error.passwordTooShort" : {
+      "comment" : "Validation error when password is shorter than the minimum",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your password should be at least 4 characters."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu contraseña debe tener al menos 4 caracteres."
+          }
+        }
+      }
+    },
+    "login.forgot.error.invalidEmail" : {
+      "comment" : "Validation error when forgot password email is invalid",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please enter a valid email address."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresa una dirección de correo válida."
+          }
+        }
+      }
+    },
+    "login.form.email.placeholder" : {
+      "comment" : "Placeholder for the email text field on login",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correo electrónico"
+          }
+        }
+      }
+    },
+    "login.form.email.sample" : {
+      "comment" : "Placeholder example email in forgot password form",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "name@email.com"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nombre@email.com"
+          }
+        }
+      }
+    },
+    "login.form.email.section" : {
+      "comment" : "Form section title for email entry",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Correo electrónico"
+          }
+        }
+      }
+    },
+    "login.form.password.hide" : {
+      "comment" : "Button title to hide the password text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar"
+          }
+        }
+      }
+    },
+    "login.form.password.placeholder" : {
+      "comment" : "Placeholder for the password field",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraseña"
+          }
+        }
+      }
+    },
+    "login.form.password.show" : {
+      "comment" : "Button title to show the password text",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar"
+          }
+        }
+      }
+    },
+    "login.overlay.reset" : {
+      "comment" : "Message shown while password reset instructions send",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sending instructions…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviando instrucciones…"
+          }
+        }
+      }
+    },
+    "login.overlay.submitting" : {
+      "comment" : "Message shown while login is being submitted",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking your credentials…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificando tus credenciales…"
+          }
+        }
+      }
+    },
+    "login.reset.button" : {
+      "comment" : "Button text to send the password reset link",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send reset link"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar enlace de restablecimiento"
+          }
+        }
+      }
+    },
+    "login.reset.error.fallback" : {
+      "comment" : "Fallback message when password reset fails",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We could not send that reset."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No pudimos enviar ese restablecimiento."
+          }
+        }
+      }
+    },
+    "login.reset.navTitle" : {
+      "comment" : "Navigation title for the forgot password screen",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot password"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olvidé mi contraseña"
+          }
+        }
+      }
+    },
+    "login.reset.success" : {
+      "comment" : "Success message shown after password reset email is sent",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We sent a magic link to %@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviamos un enlace mágico a %@."
+          }
+        }
+      }
+    },
+    "login.welcome.subtitle" : {
+      "comment" : "Subtitle text under the login hero",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to get rolling on today's deliveries."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia sesión para empezar con las entregas de hoy."
+          }
+        }
+      }
+    },
+    "login.welcome.title" : {
+      "comment" : "Headline message on the login screen",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome back"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te damos la bienvenida de nuevo"
+          }
+        }
+      }
+    },
     "onboarding.actions.back" : {
       "comment" : "Label for the back button in onboarding",
       "extractionState" : "manual",
