@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8E2DDC802EE0C2C8005C6035 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8E2DDC7F2EE0C2C8005C6035 /* Localizable.xcstrings */; };
 		8E5C87462ED765F30010B0F5 /* DeviceInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5C87452ED765F30010B0F5 /* DeviceInfoService.swift */; };
 		8EC56E5E2ED6008600FA6B0F /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56E5D2ED6008600FA6B0F /* AppRootView.swift */; };
 		8EC56E602ED623D600FA6B0F /* OnboardingDomain+Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56E5F2ED623CF00FA6B0F /* OnboardingDomain+Content.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8E2DDC7F2EE0C2C8005C6035 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		8E31748A2ED2033000D35843 /* mow-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mow-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E5C87452ED765F30010B0F5 /* DeviceInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoService.swift; sourceTree = "<group>"; };
 		8EAA00012F07438D00D61F5E /* App.base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.base.xcconfig; sourceTree = "<group>"; };
@@ -152,18 +154,6 @@
 			path = Core;
 			sourceTree = "<group>";
 		};
-		8EF000102FF5000100AAA001 /* Logging */ = {
-			isa = PBXGroup;
-			children = (
-				8EF000012FF5000100AAA001 /* LogTypes.swift */,
-				8EF000022FF5000100AAA001 /* LoggingConfiguration.swift */,
-				8EF000032FF5000100AAA001 /* LogDestinations.swift */,
-				8EF000042FF5000100AAA001 /* Logger.swift */,
-				8EF000052FF5000100AAA001 /* LoggingMocks.swift */,
-			);
-			path = Logging;
-			sourceTree = "<group>";
-		};
 		8ECEDBD72ED533EB00A79F73 /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -220,6 +210,7 @@
 			children = (
 				8ECEDBE42ED533EB00A79F73 /* Info.plist */,
 				8ECEDBE32ED533EB00A79F73 /* Assets.xcassets */,
+				8E2DDC7F2EE0C2C8005C6035 /* Localizable.xcstrings */,
 				8ECEDBE52ED533EB00A79F73 /* MowApp.swift */,
 				8ECEDBD52ED533EB00A79F73 /* Core */,
 				8ECEDBE12ED533EB00A79F73 /* Domains */,
@@ -235,6 +226,18 @@
 				8ED2B0742ED377A20054F396 /* Stage.secrets.example.xcconfig */,
 			);
 			path = Secrets;
+			sourceTree = "<group>";
+		};
+		8EF000102FF5000100AAA001 /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				8EF000012FF5000100AAA001 /* LogTypes.swift */,
+				8EF000022FF5000100AAA001 /* LoggingConfiguration.swift */,
+				8EF000032FF5000100AAA001 /* LogDestinations.swift */,
+				8EF000042FF5000100AAA001 /* Logger.swift */,
+				8EF000052FF5000100AAA001 /* LoggingMocks.swift */,
+			);
+			path = Logging;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -280,6 +283,7 @@
 			knownRegions = (
 				en,
 				Base,
+				es,
 			);
 			mainGroup = 8E3174812ED2033000D35843;
 			minimizedProjectReferenceProxies = 1;
@@ -300,6 +304,7 @@
 			files = (
 				8ECEDBF52ED533EB00A79F73 /* Assets.xcassets in Resources */,
 				8ED2B03A2ED225A00054F396 /* README.md in Resources */,
+				8E2DDC802EE0C2C8005C6035 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +406,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = LocalDev;
@@ -457,6 +463,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Prod;
@@ -579,6 +586,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Stage;
