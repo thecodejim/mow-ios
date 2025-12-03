@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 enum OnboardingDomain {
     struct Environment {
@@ -30,9 +31,9 @@ enum OnboardingDomain {
             }
 
             let id: Int
-            let title: String
-            let message: String
-            let detail: String
+            let title: LocalizedStringKey
+            let message: LocalizedStringKey
+            let detail: LocalizedStringKey
             let icon: String
             let accent: Accent
         }

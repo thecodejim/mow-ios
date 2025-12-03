@@ -1,3 +1,4 @@
+import SwiftUI
 import Foundation
 
 extension OnboardingDomain {
@@ -35,27 +36,27 @@ extension OnboardingDomain {
             static let stepConfidenceDetail = "onboarding.steps.confidence.detail"
         }
 
-        static var loadingTitle: String { localized(Key.loadingTitle) }
-        static var completionOverlayMessage: String { localized(Key.completionOverlay) }
-        static var retryButtonTitle: String { localized(Key.retryButton) }
-        static var skipButtonTitle: String { localized(Key.skipButton) }
-        static var backButtonTitle: String { localized(Key.backButton) }
-        static var nextButtonTitle: String { localized(Key.nextButton) }
-        static var launchButtonTitle: String { localized(Key.launchButton) }
+        static var loadingTitle: LocalizedStringKey { .init(Key.loadingTitle) }
+        static var completionOverlayMessage: LocalizedStringKey { .init(Key.completionOverlay) }
+        static var retryButtonTitle: LocalizedStringKey { .init(Key.retryButton) }
+        static var skipButtonTitle: LocalizedStringKey { .init(Key.skipButton) }
+        static var backButtonTitle: LocalizedStringKey { .init(Key.backButton) }
+        static var nextButtonTitle: LocalizedStringKey { .init(Key.nextButton) }
+        static var launchButtonTitle: LocalizedStringKey { .init(Key.launchButton) }
 
-        static var stepPlanTitle: String { localized(Key.stepPlanTitle) }
-        static var stepPlanMessage: String { localized(Key.stepPlanMessage) }
-        static var stepPlanDetail: String { localized(Key.stepPlanDetail) }
+        static var stepPlanTitle: LocalizedStringKey { .init(Key.stepPlanTitle) }
+        static var stepPlanMessage: LocalizedStringKey { .init(Key.stepPlanMessage) }
+        static var stepPlanDetail: LocalizedStringKey { .init(Key.stepPlanDetail) }
 
-        static var stepSyncTitle: String { localized(Key.stepSyncTitle) }
-        static var stepSyncMessage: String { localized(Key.stepSyncMessage) }
-        static var stepSyncDetail: String { localized(Key.stepSyncDetail) }
+        static var stepSyncTitle: LocalizedStringKey { .init(Key.stepSyncTitle) }
+        static var stepSyncMessage: LocalizedStringKey { .init(Key.stepSyncMessage) }
+        static var stepSyncDetail: LocalizedStringKey { .init(Key.stepSyncDetail) }
 
-        static var stepConfidenceTitle: String { localized(Key.stepConfidenceTitle) }
-        static var stepConfidenceMessage: String { localized(Key.stepConfidenceMessage) }
-        static var stepConfidenceDetail: String { localized(Key.stepConfidenceDetail) }
+        static var stepConfidenceTitle: LocalizedStringKey { .init(Key.stepConfidenceTitle) }
+        static var stepConfidenceMessage: LocalizedStringKey { .init(Key.stepConfidenceMessage) }
+        static var stepConfidenceDetail: LocalizedStringKey { .init(Key.stepConfidenceDetail) }
 
-        private static func localized(_ key: String) -> String {
+        static func string(_ key: String) -> String {
             NSLocalizedString(key, bundle: .main, comment: "")
         }
     }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BusyOverlay: View {
-    let text: String
+    let text: LocalizedStringKey
 
     var body: some View {
         ZStack {
