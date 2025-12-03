@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8E2DDC802EE0C2C8005C6035 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8E2DDC7F2EE0C2C8005C6035 /* Localizable.xcstrings */; };
+		8E2DDC822EE0F5F7005C6035 /* DebugCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2DDC812EE0F5F7005C6035 /* DebugCopy.swift */; };
 		8E5C87462ED765F30010B0F5 /* DeviceInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5C87452ED765F30010B0F5 /* DeviceInfoService.swift */; };
 		8EC56E5E2ED6008600FA6B0F /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56E5D2ED6008600FA6B0F /* AppRootView.swift */; };
 		8EC56E602ED623D600FA6B0F /* OnboardingDomain+Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56E5F2ED623CF00FA6B0F /* OnboardingDomain+Content.swift */; };
@@ -40,6 +41,7 @@
 
 /* Begin PBXFileReference section */
 		8E2DDC7F2EE0C2C8005C6035 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		8E2DDC812EE0F5F7005C6035 /* DebugCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugCopy.swift; sourceTree = "<group>"; };
 		8E31748A2ED2033000D35843 /* mow-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mow-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E5C87452ED765F30010B0F5 /* DeviceInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoService.swift; sourceTree = "<group>"; };
 		8EAA00012F07438D00D61F5E /* App.base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.base.xcconfig; sourceTree = "<group>"; };
@@ -133,9 +135,10 @@
 		8ECEDBD12ED533EB00A79F73 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				8E2DDC812EE0F5F7005C6035 /* DebugCopy.swift */,
 				8EC56E652ED6334F00FA6B0F /* DebugInfoView.swift */,
-				8ECEDBD02ED533EB00A79F73 /* BusyOverlay.swift */,
 				8EF000062FF5000100AAA001 /* LogViewerView.swift */,
+				8ECEDBD02ED533EB00A79F73 /* BusyOverlay.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -332,6 +335,7 @@
 				8EF100022FF5000100AAA001 /* LoggingConfiguration.swift in Sources */,
 				8EF100032FF5000100AAA001 /* LogDestinations.swift in Sources */,
 				8EF100042FF5000100AAA001 /* Logger.swift in Sources */,
+				8E2DDC822EE0F5F7005C6035 /* DebugCopy.swift in Sources */,
 				8EF100052FF5000100AAA001 /* LoggingMocks.swift in Sources */,
 				8EC56E602ED623D600FA6B0F /* OnboardingDomain+Content.swift in Sources */,
 				8ECEDBF12ED533EB00A79F73 /* OnboardingDomain.swift in Sources */,

@@ -18,11 +18,11 @@ struct DebugInfoView: View {
                 diagnosticsSection
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Debug Info")
+            .navigationTitle(DebugInfoCopy.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button(DebugInfoCopy.doneButtonTitle) {
                         dismiss()
                     }
                     .fontWeight(.semibold)
@@ -33,54 +33,58 @@ struct DebugInfoView: View {
     
     private var environmentSection: some View {
         Section {
-            InfoRow(label: "Environment", value: environment.name.displayName, style: .badge(environment.name.badgeColor))
-            InfoRow(label: "Log Level", value: environment.logLevel.rawValue)
+            InfoRow(label: DebugInfoCopy.environmentLabel, value: environment.name.displayName, style: .badge(environment.name.badgeColor))
+            InfoRow(label: DebugInfoCopy.logLevelLabel, value: environment.logLevel.rawValue)
         } header: {
-            Label("Environment", systemImage: "gearshape.2")
+            Label(DebugInfoCopy.environmentSectionTitle, systemImage: "gearshape.2")
         }
     }
     
     private var endpointsSection: some View {
         Section {
-            InfoRow(label: "API Base", value: environment.apiBaseURL.absoluteString, monospaced: true)
-            InfoRow(label: "Docs", value: environment.docsURL.absoluteString, monospaced: true)
-            InfoRow(label: "Portal", value: environment.portalURL.absoluteString, monospaced: true)
-            InfoRow(label: "Telemetry", value: environment.telemetryURL.absoluteString, monospaced: true)
-            InfoRow(label: "Health Token", value: maskedToken(environment.healthCheckToken), monospaced: true)
+            InfoRow(label: DebugInfoCopy.apiBaseLabel, value: environment.apiBaseURL.absoluteString, monospaced: true)
+            InfoRow(label: DebugInfoCopy.docsLabel, value: environment.docsURL.absoluteString, monospaced: true)
+            InfoRow(label: DebugInfoCopy.portalLabel, value: environment.portalURL.absoluteString, monospaced: true)
+            InfoRow(label: DebugInfoCopy.telemetryLabel, value: environment.telemetryURL.absoluteString, monospaced: true)
+            InfoRow(label: DebugInfoCopy.healthTokenLabel, value: maskedToken(environment.healthCheckToken), monospaced: true)
         } header: {
-            Label("Endpoints", systemImage: "network")
+            Label(DebugInfoCopy.endpointsSectionTitle, systemImage: "network")
         }
     }
     
     private var featureFlagsSection: some View {
         Section {
-            InfoRow(label: "Use Mock Data", value: environment.featureFlags.useMockData ? "Enabled" : "Disabled", style: environment.featureFlags.useMockData ? .enabled : .disabled)
+            InfoRow(
+                label: DebugInfoCopy.featureFlagLabel,
+                value: environment.featureFlags.useMockData ? DebugInfoCopy.featureFlagEnabledValue : DebugInfoCopy.featureFlagDisabledValue,
+                style: environment.featureFlags.useMockData ? .enabled : .disabled
+            )
         } header: {
-            Label("Feature Flags", systemImage: "flag")
+            Label(DebugInfoCopy.featureFlagsSectionTitle, systemImage: "flag")
         }
     }
     
     private var deviceSection: some View {
         Section {
-            InfoRow(label: "Device Architecture", value: deviceInfo.deviceArchitecture)
-            InfoRow(label: "iOS Version", value: deviceInfo.systemVersion)
-            InfoRow(label: "Model Name", value: deviceInfo.modelName)
+            InfoRow(label: DebugInfoCopy.deviceArchitectureLabel, value: deviceInfo.deviceArchitecture)
+            InfoRow(label: DebugInfoCopy.iosVersionLabel, value: deviceInfo.systemVersion)
+            InfoRow(label: DebugInfoCopy.modelNameLabel, value: deviceInfo.modelName)
             #if DEBUG
-            InfoRow(label: "Identifier", value: deviceInfo.identifierForVendor, monospaced: true)
+            InfoRow(label: DebugInfoCopy.identifierLabel, value: deviceInfo.identifierForVendor, monospaced: true)
             #endif
 
         } header: {
-            Label("Device", systemImage: "iphone")
+            Label(DebugInfoCopy.deviceSectionTitle, systemImage: "iphone")
         }
     }
     
     private var appSection: some View {
         Section {
-            InfoRow(label: "Version", value: environment.appVersion)
-            InfoRow(label: "Build", value: environment.buildNumber)
-            InfoRow(label: "Bundle ID", value: environment.bundleIdentifier, monospaced: true)
+            InfoRow(label: DebugInfoCopy.appVersionLabel, value: environment.appVersion)
+            InfoRow(label: DebugInfoCopy.buildLabel, value: environment.buildNumber)
+            InfoRow(label: DebugInfoCopy.bundleLabel, value: environment.bundleIdentifier, monospaced: true)
         } header: {
-            Label("App", systemImage: "app.badge")
+            Label(DebugInfoCopy.appSectionTitle, systemImage: "app.badge")
         }
     }
     private var diagnosticsSection: some View {
@@ -88,10 +92,10 @@ struct DebugInfoView: View {
             NavigationLink {
                 LogViewerView(logHistory: logHistory)
             } label: {
-                Text("View Logs")
+                Text(DebugInfoCopy.viewLogsActionTitle)
             }
         } header: {
-            Label("Diagnostics", systemImage: "terminal")
+            Label(DebugInfoCopy.diagnosticsSectionTitle, systemImage: "terminal")
         }
     }
 
@@ -116,7 +120,7 @@ private struct InfoRow: View {
         case disabled
     }
     
-    let label: String
+    let label: LocalizedStringKey
     let value: String
     var monospaced: Bool = false
     var style: Style = .plain
@@ -134,26 +138,34 @@ private struct InfoRow: View {
     private var valueView: some View {
         switch style {
         case .plain:
-            Text(value)
+            Text(verbatim: value)
                 .font(monospaced ? .footnote.monospaced() : .body)
                 .foregroundStyle(.primary)
                 .lineLimit(1)
                 .truncationMode(.middle)
         case .badge(let color):
-            Text(value)
+            Text(verbatim: value)
                 .font(.caption.weight(.semibold))
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
                 .background(color.opacity(0.15), in: Capsule())
                 .foregroundStyle(color)
         case .enabled:
-            Label(value, systemImage: "checkmark.circle.fill")
-                .font(.footnote.weight(.medium))
-                .foregroundStyle(.green)
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+                Text(verbatim: value)
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(.green)
+            }
         case .disabled:
-            Label(value, systemImage: "xmark.circle.fill")
-                .font(.footnote.weight(.medium))
-                .foregroundStyle(.secondary)
+            HStack(spacing: 6) {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundStyle(.secondary)
+                Text(verbatim: value)
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 }
@@ -191,7 +203,7 @@ struct DebugInfoButton: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "info.circle")
-                Text("v\(environment.appVersion) • \(environment.name.badgeText)")
+                Text(DebugInfoCopy.versionBadge(appVersion: environment.appVersion, environmentName: environment.name.badgeText))
             }
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -204,4 +216,5 @@ struct DebugInfoButton: View {
 
 #Preview {
     DebugInfoView(environment: .preview, deviceInfo: MockDeviceInfoService(), logHistory: MockLogHistoryProvider())
+//        .environment(\.locale, .init(identifier: "es"))
 }

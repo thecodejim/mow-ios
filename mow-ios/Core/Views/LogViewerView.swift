@@ -101,9 +101,9 @@ struct LogViewerView: View {
                     Image(systemName: "doc.text.magnifyingglass")
                         .font(.largeTitle)
                         .foregroundStyle(.secondary)
-                    Text("No logs yet")
+                    Text(LogViewerCopy.emptyTitle)
                         .font(.headline)
-                    Text("Interact with the app and recent logs will show up here.")
+                    Text(LogViewerCopy.emptySubtitle)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -127,8 +127,8 @@ struct LogViewerView: View {
             .background(.bar)
             .padding(.bottom, 4)
         }
-        .searchable(text: $viewModel.searchText, prompt: "Search message or metadata")
-        .navigationTitle("Logs")
+        .searchable(text: $viewModel.searchText, prompt: LogViewerCopy.searchPrompt)
+        .navigationTitle(LogViewerCopy.title)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
@@ -141,10 +141,10 @@ struct LogViewerView: View {
                     }
                 }
                 .disabled(isExporting)
-                .accessibilityLabel("Export logs")
+                .accessibilityLabel(Text(LogViewerCopy.exportAccessibilityLabel))
             }
         }
-        .alert("Export Failed", isPresented: Binding(
+        .alert(LogViewerCopy.exportFailedTitle, isPresented: Binding(
             get: { exportError != nil },
             set: { if !$0 { exportError = nil } }
         ), actions: {},
@@ -278,11 +278,11 @@ private struct LogEntryRow: View {
 
             if !entry.pii.isEmpty {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("PII")
+                    Text(LogViewerCopy.piiLabel)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                     ForEach(entry.pii.sorted(by: { $0.key < $1.key }), id: \.key) { key, value in
-                        Text("\(key): \(value.redacted)")
+                        Text(LogViewerCopy.piiEntry(key: key, value: value.redacted))
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(.secondary)
                     }
@@ -329,5 +329,6 @@ private extension LogLevel {
 #Preview {
     NavigationStack {
         LogViewerView(logHistory: MockLogHistoryProvider())
+//            .environment(\.locale, .init(identifier: "es"))
     }
 }
