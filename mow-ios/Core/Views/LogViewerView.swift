@@ -289,7 +289,7 @@ private struct LogEntryRow: View {
                 }
             }
 
-            Text("\(entry.category.rawValue) • \(entry.source.function) • \(entry.source.file):\(entry.source.line)")
+            Text(verbatim: "\(entry.category.rawValue) • \(entry.source.function) • \(entry.source.file):\(entry.source.line)")
                 .font(.caption2.monospaced())
                 .foregroundStyle(.secondary)
         }

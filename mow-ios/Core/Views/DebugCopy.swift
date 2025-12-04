@@ -29,7 +29,6 @@ enum DebugInfoCopy {
         static let buildLabel = "debugInfo.label.build"
         static let bundleLabel = "debugInfo.label.bundleId"
         static let viewLogs = "debugInfo.action.viewLogs"
-        static let versionBadge = "debugInfo.button.versionBadge"
     }
 
     static var title: LocalizedStringKey { .init(Key.title) }
@@ -59,8 +58,8 @@ enum DebugInfoCopy {
 
     static var viewLogsActionTitle: LocalizedStringKey { .init(Key.viewLogs) }
 
-    static func versionBadge(appVersion: String, environmentName: String) -> LocalizedStringKey {
-        LocalizedStringKey("\(Key.versionBadge) \(appVersion) \(environmentName)")
+    static func versionBadge(appVersion: String, environmentName: String) -> String {
+        "v\(appVersion) • \(environmentName)"
     }
 
     static var featureFlagEnabledValue: String { localized(Key.enabledValue) }
@@ -80,7 +79,6 @@ enum LogViewerCopy {
         static let exportAccessibility = "logViewer.export.accessibilityLabel"
         static let exportFailedTitle = "logViewer.export.failedTitle"
         static let piiLabel = "logViewer.metadata.pii"
-        static let piiEntry = "logViewer.metadata.piiEntry"
     }
 
     static var title: LocalizedStringKey { .init(Key.title) }
@@ -91,8 +89,8 @@ enum LogViewerCopy {
     static var exportFailedTitle: LocalizedStringKey { .init(Key.exportFailedTitle) }
     static var piiLabel: LocalizedStringKey { .init(Key.piiLabel) }
 
-    static func piiEntry(key: String, value: String) -> LocalizedStringKey {
-        LocalizedStringKey("\(Key.piiEntry) \(key) \(value)")
+    static func piiEntry(key: String, value: String) -> String {
+        "\(key): \(value)"
     }
 }
 

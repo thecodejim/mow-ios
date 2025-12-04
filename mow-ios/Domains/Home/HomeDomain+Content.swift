@@ -46,12 +46,28 @@ extension HomeDomain {
         static var logoutButtonTitle: LocalizedStringKey { .init(Key.logoutButton) }
         static var logoutFooterText: LocalizedStringKey { .init(Key.logoutFooter) }
 
-        static func mealMetadata(calories: Int, deliveryTime: Date) -> LocalizedStringKey {
-            "home.meals.metadata \(calories) \(deliveryTime, format: .dateTime.hour().minute())"
+        static func mealMetadata(calories: Int, deliveryTime: Date) -> String {
+            // Localized time string
+            let timeString = deliveryTime.formatted(
+                .dateTime
+                    .hour()
+                    .minute()
+                    .locale(.current)
+            )
+
+            // Localized format string, e.g. "%d cal • %@"
+            let format = String(localized: "home.meals.metadata")
+
+            // Plug in calories + time
+            return String(format: format, locale: .current, calories, timeString)
         }
 
-        static func deliveryDistance(_ miles: Double) -> LocalizedStringKey {
-            "home.deliveries.distance \(miles, format: .number.precision(.fractionLength(1)))"
+        static func deliveryDistance(_ miles: Double) -> String {
+            // Get the localized format string, e.g. "%#.1f mi"
+            let format = String(localized: "home.deliveries.distance")
+
+            // Format with the current locale so decimal separators etc. are correct
+            return String(format: format, locale: .current, miles)
         }
 
         // MARK: - Domain Copy
