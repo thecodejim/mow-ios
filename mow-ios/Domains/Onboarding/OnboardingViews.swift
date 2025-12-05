@@ -221,5 +221,5 @@ private extension OnboardingDomain.State {
     }()
     
     OnboardingRootView(store: coordinator.onboardingStore)
-        .environment(\.locale, .init(identifier: "es"))
+//        .environment(\.locale, .init(identifier: "es"))
 }

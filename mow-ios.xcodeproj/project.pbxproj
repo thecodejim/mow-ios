@@ -39,6 +39,7 @@
 		8EF100042FF5000100AAA001 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000042FF5000100AAA001 /* Logger.swift */; };
 		8EF100052FF5000100AAA001 /* LoggingMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000052FF5000100AAA001 /* LoggingMocks.swift */; };
 		8EF100062FF5000100AAA001 /* LogViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000062FF5000100AAA001 /* LogViewerView.swift */; };
+		8EFC081B2EE359F00064AEDE /* UnitTestPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EFC08192EE359F00064AEDE /* UnitTestPlaceholderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +97,7 @@
 		8EF000042FF5000100AAA001 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		8EF000052FF5000100AAA001 /* LoggingMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingMocks.swift; sourceTree = "<group>"; };
 		8EF000062FF5000100AAA001 /* LogViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerView.swift; sourceTree = "<group>"; };
+		8EFC08192EE359F00064AEDE /* UnitTestPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitTestPlaceholderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,6 +176,7 @@
 				8EC56E652ED6334F00FA6B0F /* DebugInfoView.swift */,
 				8EF000062FF5000100AAA001 /* LogViewerView.swift */,
 				8ECEDBD02ED533EB00A79F73 /* BusyOverlay.swift */,
+				8EFC08192EE359F00064AEDE /* UnitTestPlaceholderView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -378,6 +381,7 @@
 			files = (
 				8ECEDBE72ED533EB00A79F73 /* AppCoordinator.swift in Sources */,
 				8ECEDBE82ED533EB00A79F73 /* BusyOverlay.swift in Sources */,
+				8EFC081B2EE359F00064AEDE /* UnitTestPlaceholderView.swift in Sources */,
 				8ECEDBE92ED533EB00A79F73 /* AppDependencies.swift in Sources */,
 				8EF100062FF5000100AAA001 /* LogViewerView.swift in Sources */,
 				8EC56E642ED62D8C00FA6B0F /* LoginDomain+Content.swift in Sources */,

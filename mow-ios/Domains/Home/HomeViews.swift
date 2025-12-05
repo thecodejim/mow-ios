@@ -295,5 +295,5 @@ private extension HomeDomain.State {
     }()
     
     HomeRootView(store: coordinator.homeStore)
-        .environment(\.locale, .init(identifier: "es"))
+//        .environment(\.locale, .init(identifier: "es"))
 }

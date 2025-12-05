@@ -160,3 +160,10 @@ extension AppEnvironment {
         bundleIdentifier: "com.example.mow.preview"
     )
 }
+
+extension AppEnvironment {
+    static let isRunningUnitTests: Bool = {
+        // XCTestCase only exists in-process when a unit test bundle is injected
+        NSClassFromString("XCTestCase") != nil
+    }()
+}
