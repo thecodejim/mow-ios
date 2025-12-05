@@ -10,6 +10,9 @@
 		8E2DDC802EE0C2C8005C6035 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8E2DDC7F2EE0C2C8005C6035 /* Localizable.xcstrings */; };
 		8E2DDC822EE0F5F7005C6035 /* DebugCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2DDC812EE0F5F7005C6035 /* DebugCopy.swift */; };
 		8E5C87462ED765F30010B0F5 /* DeviceInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5C87452ED765F30010B0F5 /* DeviceInfoService.swift */; };
+		8E645231BB7CF1001E /* TestMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E645231BB7C3B2014 /* TestMocks.swift */; };
+		8E645231BB7D26C01F /* StoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E645231BB7C703015 /* StoreTests.swift */; };
+		8E645231BB7D5D4020 /* AppDomainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E645231BB7CB79016 /* AppDomainTests.swift */; };
 		8EC56E5E2ED6008600FA6B0F /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56E5D2ED6008600FA6B0F /* AppRootView.swift */; };
 		8EC56E602ED623D600FA6B0F /* OnboardingDomain+Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56E5F2ED623CF00FA6B0F /* OnboardingDomain+Content.swift */; };
 		8EC56E622ED6243900FA6B0F /* HomeDomain+Content.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC56E612ED6243400FA6B0F /* HomeDomain+Content.swift */; };
@@ -30,7 +33,6 @@
 		8ECEDBF32ED533EB00A79F73 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECEDBE22ED533EB00A79F73 /* AppEnvironment.swift */; };
 		8ECEDBF42ED533EB00A79F73 /* MowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECEDBE52ED533EB00A79F73 /* MowApp.swift */; };
 		8ECEDBF52ED533EB00A79F73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8ECEDBE32ED533EB00A79F73 /* Assets.xcassets */; };
-		8ED2B03A2ED225A00054F396 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 8ED2B0392ED225A00054F396 /* README.md */; };
 		8EF100012FF5000100AAA001 /* LogTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000012FF5000100AAA001 /* LogTypes.swift */; };
 		8EF100022FF5000100AAA001 /* LoggingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000022FF5000100AAA001 /* LoggingConfiguration.swift */; };
 		8EF100032FF5000100AAA001 /* LogDestinations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000032FF5000100AAA001 /* LogDestinations.swift */; };
@@ -39,11 +41,25 @@
 		8EF100062FF5000100AAA001 /* LogViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EF000062FF5000100AAA001 /* LogViewerView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		8EFC08172EE33F5C0064AEDE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8E3174822ED2033000D35843 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8E3174892ED2033000D35843;
+			remoteInfo = "mow-ios";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		8E2DDC7F2EE0C2C8005C6035 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		8E2DDC812EE0F5F7005C6035 /* DebugCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugCopy.swift; sourceTree = "<group>"; };
 		8E31748A2ED2033000D35843 /* mow-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mow-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E5C87452ED765F30010B0F5 /* DeviceInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoService.swift; sourceTree = "<group>"; };
+		8E645231BB7A036002 /* mow-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mow-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E645231BB7C3B2014 /* TestMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMocks.swift; sourceTree = "<group>"; };
+		8E645231BB7C703015 /* StoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreTests.swift; sourceTree = "<group>"; };
+		8E645231BB7CB79016 /* AppDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDomainTests.swift; sourceTree = "<group>"; };
 		8EAA00012F07438D00D61F5E /* App.base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.base.xcconfig; sourceTree = "<group>"; };
 		8EAA00022F07438D00D61F5E /* LocalDev.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = LocalDev.xcconfig; sourceTree = "<group>"; };
 		8EAA00032F07438D00D61F5E /* Stage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Stage.xcconfig; sourceTree = "<group>"; };
@@ -90,6 +106,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8E645231BB7A76A004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -99,6 +122,7 @@
 				8ED2B0392ED225A00054F396 /* README.md */,
 				8EAA00052F07438D00D61F5E /* Config */,
 				8ECEDBE62ED533EB00A79F73 /* mow-ios */,
+				8E645231BB7A405003 /* mow-iosTests */,
 				8E31748B2ED2033000D35843 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -107,8 +131,19 @@
 			isa = PBXGroup;
 			children = (
 				8E31748A2ED2033000D35843 /* mow-ios.app */,
+				8E645231BB7A036002 /* mow-iosTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		8E645231BB7A405003 /* mow-iosTests */ = {
+			isa = PBXGroup;
+			children = (
+				8E645231BB7C3B2014 /* TestMocks.swift */,
+				8E645231BB7C703015 /* StoreTests.swift */,
+				8E645231BB7CB79016 /* AppDomainTests.swift */,
+			);
+			path = "mow-iosTests";
 			sourceTree = "<group>";
 		};
 		8EAA00052F07438D00D61F5E /* Config */ = {
@@ -265,6 +300,25 @@
 			productReference = 8E31748A2ED2033000D35843 /* mow-ios.app */;
 			productType = "com.apple.product-type.application";
 		};
+		8E645231BB79BFE001 /* mow-iosTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8E645231BB7B5C7008 /* Build configuration list for PBXNativeTarget "mow-iosTests" */;
+			buildPhases = (
+				8E645231BB7AAF4005 /* Sources */,
+				8E645231BB7A76A004 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8EFC08182EE33F5C0064AEDE /* PBXTargetDependency */,
+			);
+			name = "mow-iosTests";
+			packageProductDependencies = (
+			);
+			productName = "mow-iosTests";
+			productReference = 8E645231BB7A036002 /* mow-iosTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -277,6 +331,10 @@
 				TargetAttributes = {
 					8E3174892ED2033000D35843 = {
 						CreatedOnToolsVersion = 26.1.1;
+					};
+					8E645231BB79BFE001 = {
+						CreatedOnToolsVersion = 26.1.1;
+						TestTargetID = 8E3174892ED2033000D35843;
 					};
 				};
 			};
@@ -296,6 +354,7 @@
 			projectRoot = "";
 			targets = (
 				8E3174892ED2033000D35843 /* mow-ios */,
+				8E645231BB79BFE001 /* mow-iosTests */,
 			);
 		};
 /* End PBXProject section */
@@ -306,7 +365,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8ECEDBF52ED533EB00A79F73 /* Assets.xcassets in Resources */,
-				8ED2B03A2ED225A00054F396 /* README.md in Resources */,
 				8E2DDC802EE0C2C8005C6035 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -348,10 +406,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8E645231BB7AAF4005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8E645231BB7CF1001E /* TestMocks.swift in Sources */,
+				8E645231BB7D26C01F /* StoreTests.swift in Sources */,
+				8E645231BB7D5D4020 /* AppDomainTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		8EFC08182EE33F5C0064AEDE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8E3174892ED2033000D35843 /* mow-ios */;
+			targetProxy = 8EFC08172EE33F5C0064AEDE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
-		8E3174932ED2033100D35843 /* LocalDev */ = {
+		8E3174932ED2033100D35843 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -408,12 +484,13 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "-enable-testing";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
-			name = LocalDev;
+			name = Debug;
 		};
 		8E3174942ED2033100D35843 /* Prod */ = {
 			isa = XCBuildConfiguration;
@@ -472,7 +549,7 @@
 			};
 			name = Prod;
 		};
-		8E3174962ED2033100D35843 /* LocalDev */ = {
+		8E3174962ED2033100D35843 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8EAA00022F07438D00D61F5E /* LocalDev.xcconfig */;
 			buildSettings = {
@@ -503,7 +580,7 @@
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
-			name = LocalDev;
+			name = Debug;
 		};
 		8E3174972ED2033100D35843 /* Prod */ = {
 			isa = XCBuildConfiguration;
@@ -535,6 +612,60 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Prod;
+		};
+		8E645231BB7B96F009 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mow.mow-iosTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/mow-ios.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/mow-ios";
+			};
+			name = Debug;
+		};
+		8E645231BB7BCFD00A /* Stage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mow.mow-iosTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/mow-ios.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/mow-ios";
+			};
+			name = Stage;
+		};
+		8E645231BB7C05200B /* Prod */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mow.mow-iosTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/mow-ios.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/mow-ios";
 			};
 			name = Prod;
 		};
@@ -634,22 +765,32 @@
 		8E3174852ED2033000D35843 /* Build configuration list for PBXProject "mow-ios" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				8E3174932ED2033100D35843 /* LocalDev */,
+				8E3174932ED2033100D35843 /* Debug */,
 				8EAA00072F07438D00D61F5E /* Stage */,
 				8E3174942ED2033100D35843 /* Prod */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Prod;
+			defaultConfigurationName = Debug;
 		};
 		8E3174952ED2033100D35843 /* Build configuration list for PBXNativeTarget "mow-ios" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				8E3174962ED2033100D35843 /* LocalDev */,
+				8E3174962ED2033100D35843 /* Debug */,
 				8EAA00082F07438D00D61F5E /* Stage */,
 				8E3174972ED2033100D35843 /* Prod */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Prod;
+			defaultConfigurationName = Debug;
+		};
+		8E645231BB7B5C7008 /* Build configuration list for PBXNativeTarget "mow-iosTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8E645231BB7B96F009 /* Debug */,
+				8E645231BB7BCFD00A /* Stage */,
+				8E645231BB7C05200B /* Prod */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};

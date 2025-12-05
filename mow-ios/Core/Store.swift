@@ -33,8 +33,7 @@ struct Effect<Action> {
     }
 }
 
-typealias Reducer<State, Action, Environment> =
-    @MainActor (inout State, Action, Environment) -> Effect<Action>
+typealias Reducer<State, Action, Environment> = (inout State, Action, Environment) -> Effect<Action>
 
 @MainActor
 final class Store<State, Action, Environment>: ObservableObject {
@@ -51,6 +50,14 @@ final class Store<State, Action, Environment>: ObservableObject {
         self.environment = environment
         self.reducer = reducer
     }
+    
+    /// Workaround for a Swift Concurrency + AddressSanitizer bug where
+    /// deallocating a @MainActor class can crash inside TaskLocal teardown.
+    /// Deinit must remain empty / not touch actor-isolated state.
+    /// Only happened in StoreTests
+    #if DEBUG
+    nonisolated deinit { }
+    #endif
 
     /// Public entry point for sending actions.
     /// Reducer runs synchronously on the main actor; effects are detached.
@@ -116,6 +123,14 @@ final class StoreScope<
                 self?.state = childState
             }
     }
+    
+    /// Workaround for a Swift Concurrency + AddressSanitizer bug where
+    /// deallocating a @MainActor class can crash inside TaskLocal teardown.
+    /// Deinit must remain empty / not touch actor-isolated state.
+    /// Only happened in StoreTests
+    #if DEBUG
+    nonisolated deinit { }
+    #endif
 
     func send(_ action: ChildAction) {
         parent?.send(fromChildAction(action))

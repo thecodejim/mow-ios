@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "902A9B88-7010-4405-BB41-E3E67F3DD169",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:mow-ios.xcodeproj",
+      "identifier" : "8E3174892ED2033000D35843",
+      "name" : "mow-ios"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:mow-ios.xcodeproj",
+        "identifier" : "8E645231BB79BFE001",
+        "name" : "mow-iosTests"
+      }
+    }
+  ],
+  "version" : 1
+}
