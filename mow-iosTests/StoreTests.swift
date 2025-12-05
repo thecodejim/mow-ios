@@ -1,13 +1,15 @@
-import XCTest
-import Combine
+import Testing
+import Foundation
 @testable import mow_ios
 
+// MARK: - Effect Tests
+
+@Suite("Effect Tests")
 @MainActor
-final class StoreTests: XCTestCase {
+struct EffectTests {
     
-    // MARK: - Effect Tests
-    
-    func test_Effect_none_returnsNil() async {
+    @Test("Effect.none returns nil")
+    func noneReturnsNil() async {
         // Given: A none effect
         let effect = Effect<String>.none
         
@@ -15,10 +17,11 @@ final class StoreTests: XCTestCase {
         let result = await effect.run()
         
         // Then: It returns nil
-        XCTAssertNil(result)
+        #expect(result == nil)
     }
     
-    func test_Effect_send_returnsAction() async {
+    @Test("Effect.send returns action")
+    func sendReturnsAction() async {
         // Given: A send effect with an action
         let expectedAction = "TestAction"
         let effect = Effect<String>.send(expectedAction)
@@ -27,10 +30,11 @@ final class StoreTests: XCTestCase {
         let result = await effect.run()
         
         // Then: It returns the action
-        XCTAssertEqual(result, expectedAction)
+        #expect(result == expectedAction)
     }
     
-    func test_Effect_task_executesWorkAndReturnsResult() async {
+    @Test("Effect.task executes work and returns result")
+    func taskExecutesWorkAndReturnsResult() async {
         // Given: A task effect that performs async work
         var workExecuted = false
         let effect = Effect<String>.task {
@@ -42,11 +46,12 @@ final class StoreTests: XCTestCase {
         let result = await effect.run()
         
         // Then: The work is executed and result is returned
-        XCTAssertTrue(workExecuted)
-        XCTAssertEqual(result, "WorkCompleted")
+        #expect(workExecuted == true)
+        #expect(result == "WorkCompleted")
     }
     
-    func test_Effect_fireAndForget_executesWorkAndReturnsNil() async {
+    @Test("Effect.fireAndForget executes work and returns nil")
+    func fireAndForgetExecutesWorkAndReturnsNil() async {
         // Given: A fire-and-forget effect
         var workExecuted = false
         let effect = Effect<String>.fireAndForget {
@@ -57,23 +62,33 @@ final class StoreTests: XCTestCase {
         let result = await effect.run()
         
         // Then: Work is executed but no action is returned
-        XCTAssertTrue(workExecuted)
-        XCTAssertNil(result)
+        #expect(workExecuted == true)
+        #expect(result == nil)
     }
     
-    func test_Effect_map_transformsAction() async {
+    @Test(
+        "Effect.map transforms string length correctly",
+        arguments: [
+            ("test", 4),
+            ("", 0),
+            ("hello", 5),
+            ("swift", 5)
+        ]
+    )
+    func mapTransformsAction_parametrized(input: String, expectedCount: Int) async {
         // Given: An effect that returns a string
-        let effect = Effect<String>.send("test")
+        let effect = Effect<String>.send(input)
         
         // When: The effect is mapped to an integer
         let mappedEffect = effect.map { $0.count }
         let result = await mappedEffect.run()
         
         // Then: The action is transformed
-        XCTAssertEqual(result, 4)
+        #expect(result == expectedCount)
     }
     
-    func test_Effect_map_withNone_returnsNil() async {
+    @Test("Effect.map with none returns nil")
+    func mapWithNoneReturnsNil() async {
         // Given: A none effect
         let effect = Effect<String>.none
         
@@ -82,12 +97,18 @@ final class StoreTests: XCTestCase {
         let result = await mappedEffect.run()
         
         // Then: It still returns nil
-        XCTAssertNil(result)
+        #expect(result == nil)
     }
+}
+
+// MARK: - Store Tests
+
+@Suite("Store Tests", .serialized)
+@MainActor
+struct StoreTests {
     
-    // MARK: - Store Tests
-    
-    func test_Store_initialState_isSetCorrectly() {
+    @Test("Store initial state is set correctly")
+    func initialStateIsSetCorrectly() {
         // Given: A store with initial state
         let initialState = TestState(count: 5)
         let store = Store(
@@ -98,10 +119,11 @@ final class StoreTests: XCTestCase {
         
         // When: We check the state
         // Then: Initial state is set correctly
-        XCTAssertEqual(store.state.count, 5)
+        #expect(store.state.count == 5)
     }
     
-    func test_Store_sendAction_updatesState() {
+    @Test("Store sendAction updates state")
+    func sendActionUpdatesState() {
         // Given: A store with initial count of 0
         let store = Store(
             initialState: TestState(count: 0),
@@ -113,10 +135,11 @@ final class StoreTests: XCTestCase {
         store.send(.increment)
         
         // Then: State is updated immediately
-        XCTAssertEqual(store.state.count, 1)
+        #expect(store.state.count == 1)
     }
     
-    func test_Store_sendAction_executesReducer() {
+    @Test("Store sendAction executes reducer")
+    func sendActionExecutesReducer() {
         // Given: A store with tracking environment
         let environment = TestEnvironment()
         let store = Store(
@@ -129,10 +152,11 @@ final class StoreTests: XCTestCase {
         store.send(.setValue(42))
         
         // Then: Reducer processes the action
-        XCTAssertEqual(store.state.count, 42)
+        #expect(store.state.count == 42)
     }
     
-    func test_Store_sendAction_withEffect_executesFollowUpAction() async {
+    @Test("Store sendAction with effect executes follow-up action")
+    func sendActionWithEffectExecutesFollowUpAction() async {
         // Given: A store with initial state
         let store = Store(
             initialState: TestState(count: 0),
@@ -144,14 +168,15 @@ final class StoreTests: XCTestCase {
         store.send(.incrementWithEffect)
         
         // Then: State is updated immediately
-        XCTAssertEqual(store.state.count, 1)
+        #expect(store.state.count == 1)
         
         // And: After effect completes, follow-up action is processed
         try? await Task.sleep(nanoseconds: 50_000_000) // Brief wait for effect
-        XCTAssertEqual(store.state.count, 2) // Effect sends another increment
+        #expect(store.state.count == 2) // Effect sends another increment
     }
     
-    func test_Store_multipleActions_processedSequentially() {
+    @Test("Store multiple actions processed sequentially")
+    func multipleActionsProcessedSequentially() {
         // Given: A store with initial count of 0
         let store = Store(
             initialState: TestState(count: 0),
@@ -165,10 +190,11 @@ final class StoreTests: XCTestCase {
         store.send(.increment)
         
         // Then: All actions are processed
-        XCTAssertEqual(store.state.count, 3)
+        #expect(store.state.count == 3)
     }
     
-    func test_Store_observableObject_publishesStateChanges() {
+    @Test("Store ObservableObject publishes state changes")
+    func observableObjectPublishesStateChanges() async {
         // Given: A store and expectation for state change
         let store = Store(
             initialState: TestState(count: 0),
@@ -176,29 +202,36 @@ final class StoreTests: XCTestCase {
             reducer: testReducer
         )
         
-        let expectation = XCTestExpectation(description: "State change published")
         var receivedCount: Int?
         
-        let cancellable = store.$state.sink { state in
-            receivedCount = state.count
-            if state.count == 10 {
-                expectation.fulfill()
+        let task = Task {
+            for await state in store.$state.values {
+                receivedCount = state.count
+                if state.count == 10 {
+                    break
+                }
             }
         }
         
         // When: State is changed
+        try? await Task.sleep(nanoseconds: 10_000_000)
         store.send(.setValue(10))
         
         // Then: Subscriber receives the update
-        wait(for: [expectation], timeout: 1.0)
-        XCTAssertEqual(receivedCount, 10)
-        
-        cancellable.cancel()
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        task.cancel()
+        #expect(receivedCount == 10)
     }
+}
+
+// MARK: - StoreScope Tests
+
+@Suite("StoreScope Tests")
+@MainActor
+struct StoreScopeTests {
     
-    // MARK: - StoreScope Tests
-    
-    func test_StoreScope_extractsChildState() {
+    @Test("StoreScope extracts child state")
+    func extractsChildState() {
         // Given: A parent store with nested state
         let parentStore = Store(
             initialState: ParentState(child: ChildState(name: "Test", value: 42)),
@@ -214,11 +247,12 @@ final class StoreTests: XCTestCase {
         )
         
         // Then: Child state is extracted correctly
-        XCTAssertEqual(childStore.state.name, "Test")
-        XCTAssertEqual(childStore.state.value, 42)
+        #expect(childStore.state.name == "Test")
+        #expect(childStore.state.value == 42)
     }
     
-    func test_StoreScope_sendsActionToParent() {
+    @Test("StoreScope sends action to parent")
+    func sendsActionToParent() {
         // Given: A parent store and scoped child store
         let parentStore = Store(
             initialState: ParentState(child: ChildState(name: "Initial", value: 0)),
@@ -236,11 +270,12 @@ final class StoreTests: XCTestCase {
         childStore.send(.updateName("Updated"))
         
         // Then: Parent state is updated
-        XCTAssertEqual(parentStore.state.child.name, "Updated")
-        XCTAssertEqual(childStore.state.name, "Updated")
+        #expect(parentStore.state.child.name == "Updated")
+        #expect(childStore.state.name == "Updated")
     }
     
-    func test_StoreScope_syncsWithParentStateChanges() {
+    @Test("StoreScope syncs with parent state changes")
+    func syncsWithParentStateChanges() {
         // Given: A parent store and scoped child store
         let parentStore = Store(
             initialState: ParentState(child: ChildState(name: "Initial", value: 0)),
@@ -258,11 +293,12 @@ final class StoreTests: XCTestCase {
         parentStore.send(.child(.incrementValue))
         
         // Then: Child store state is synchronized
-        XCTAssertEqual(childStore.state.value, 1)
-        XCTAssertEqual(parentStore.state.child.value, 1)
+        #expect(childStore.state.value == 1)
+        #expect(parentStore.state.child.value == 1)
     }
     
-    func test_StoreScope_removeDuplicates_preventsUnnecessaryUpdates() {
+    @Test("StoreScope removeDuplicates prevents unnecessary updates")
+    func removeDuplicatesPreventsUnnecessaryUpdates() async {
         // Given: A parent store and scoped child store
         let parentStore = Store(
             initialState: ParentState(
@@ -280,25 +316,31 @@ final class StoreTests: XCTestCase {
         )
         
         var updateCount = 0
-        let cancellable = childStore.$state.sink { _ in
-            updateCount += 1
+        let task = Task {
+            for await _ in childStore.$state.values {
+                updateCount += 1
+            }
         }
         
+        try? await Task.sleep(nanoseconds: 10_000_000)
         let initialUpdateCount = updateCount
         
         // When: Unrelated parent state changes (child state stays the same)
         parentStore.send(.incrementUnrelatedCounter)
         parentStore.send(.incrementUnrelatedCounter)
         
+        try? await Task.sleep(nanoseconds: 10_000_000)
+        
         // Then: Child store doesn't receive unnecessary updates
         // Note: Initial subscription triggers one update
-        XCTAssertEqual(updateCount, initialUpdateCount)
-        XCTAssertEqual(childStore.state.name, "Test")
+        #expect(updateCount == initialUpdateCount)
+        #expect(childStore.state.name == "Test")
         
-        cancellable.cancel()
+        task.cancel()
     }
     
-    func test_StoreScope_weakParentReference_doesNotRetainParent() {
+    @Test("StoreScope weak parent reference does not retain parent")
+    func weakParentReferenceDoesNotRetainParent() {
         // Given: A parent store
         var parentStore: Store<ParentState, ParentAction, ParentEnvironment>? = Store(
             initialState: ParentState(child: ChildState(name: "Test", value: 0)),
@@ -319,13 +361,13 @@ final class StoreTests: XCTestCase {
         )
         
         // And: Parent store is deallocated
-        XCTAssertNotNil(childStore)
+        #expect(childStore != nil)
         parentStore = nil
         
         // Then: Child store's parent reference is nil (weak reference works)
         // This is tested by the fact that sending an action has no effect
         childStore?.send(.updateName("ShouldNotCrash"))
-        XCTAssertEqual(childStore?.state.name, "Test") // State unchanged
+        #expect(childStore?.state.name == "Test") // State unchanged
     }
 }
 
