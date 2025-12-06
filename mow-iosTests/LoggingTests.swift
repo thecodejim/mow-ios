@@ -1,15 +1,17 @@
 import Testing
 import Foundation
-@testable import mow_ios
+@_spi(Testing) @testable import mow_ios
 
 // MARK: - Test Mocks
 
 actor TestLogDestination: LogDestination {
     private(set) var writtenEntries: [LogEntry] = []
     private(set) var flushCallCount = 0
+    private var waiters: [(Int, CheckedContinuation<[LogEntry], Never>)] = []
     
     func write(_ entry: LogEntry) async {
         writtenEntries.append(entry)
+        notifyWaitersIfNeeded()
     }
     
     func flush() async {
@@ -19,6 +21,32 @@ actor TestLogDestination: LogDestination {
     func reset() {
         writtenEntries = []
         flushCallCount = 0
+    }
+    
+    func waitForAtLeast(_ minCount: Int) async -> [LogEntry] {
+        if writtenEntries.count >= minCount {
+            return writtenEntries
+        }
+        
+        return await withCheckedContinuation { continuation in
+            waiters.append((minCount, continuation))
+        }
+    }
+    
+    private func notifyWaitersIfNeeded() {
+        guard !waiters.isEmpty else { return }
+        let currentEntries = writtenEntries
+        var remaining: [(Int, CheckedContinuation<[LogEntry], Never>)] = []
+        
+        for (minCount, continuation) in waiters {
+            if currentEntries.count >= minCount {
+                continuation.resume(returning: currentEntries)
+            } else {
+                remaining.append((minCount, continuation))
+            }
+        }
+        
+        waiters = remaining
     }
 }
 
@@ -718,7 +746,7 @@ struct DefaultLoggerTests {
         await logger.flush()
         
         // Then: Message is logged
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.message == "Info message")
         #expect(entries.first?.level == .info)
@@ -758,7 +786,7 @@ struct DefaultLoggerTests {
         await logger.flush()
         
         // Then: Only network debug is logged
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.message == "Network debug")
         #expect(entries.first?.category == .network)
@@ -797,7 +825,7 @@ struct DefaultLoggerTests {
         await logger.flush()
         
         // Then: Log entry uses custom date
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.timestamp == fixedDate)
     }
@@ -835,7 +863,7 @@ struct DefaultLoggerTests {
         await logger.flush()
         
         // Then: Log entry has offset applied
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.timestamp == baseDate.addingTimeInterval(3600))
     }
@@ -871,7 +899,7 @@ struct DefaultLoggerTests {
         await logger.flush()
         
         // Then: Entry includes global metadata
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.metadata["globalKey"] != nil)
     }
@@ -910,7 +938,7 @@ struct DefaultLoggerTests {
         await logger.flush()
         
         // Then: Entry includes scope metadata
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.scope["scopeKey"] != nil)
     }
@@ -950,7 +978,7 @@ struct DefaultLoggerTests {
         await logger.flush()
         
         // Then: Entry includes both scope metadata
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.scope["key1"] != nil)
         #expect(entries.first?.scope["key2"] != nil)
@@ -991,7 +1019,7 @@ struct DefaultLoggerTests {
         await logger.flush()
         
         // Then: Child value overrides parent
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         if case .string(let value) = entries.first?.scope["key"] {
             #expect(value == "child")
@@ -1031,7 +1059,7 @@ struct DefaultLoggerTests {
         await logger.flush()
         
         // Then: Metadata contains redacted value
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         if case .string(let value) = entries.first?.metadata["email"] {
             #expect(value.contains("•"))
@@ -1074,7 +1102,7 @@ struct DefaultLoggerTests {
         await logger.flush()
         
         // Then: PII representation includes hash
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.pii["email"]?.hash != nil)
     }
@@ -1144,7 +1172,7 @@ struct DefaultLoggerTests {
         await logger.flush()
         
         // Then: Metadata includes error
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.metadata["error"] != nil)
     }
@@ -1180,7 +1208,7 @@ struct LogPipelineTests {
         await pipeline.flush()
         
         // Then: Entry is written to destination
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.message == "Test")
     }
@@ -1211,7 +1239,7 @@ struct LogPipelineTests {
         await pipeline.flush()
         
         // Then: Entries are in correct order
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(10)
         #expect(entries.count == 10)
         for i in 0..<10 {
             #expect(entries[i].sequence == UInt64(i))
@@ -1255,7 +1283,7 @@ struct LogPipelineTests {
         await pipeline.flush()
         
         // Then: Entries are written in correct order
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(2)
         #expect(entries.count == 2)
         #expect(entries[0].message == "First")
         #expect(entries[1].message == "Second")
@@ -1286,8 +1314,8 @@ struct LogPipelineTests {
         await pipeline.flush()
         
         // Then: Entry is written to all destinations
-        let entries1 = await destination1.writtenEntries
-        let entries2 = await destination2.writtenEntries
+        let entries1 = await destination1.waitForAtLeast(1)
+        let entries2 = await destination2.waitForAtLeast(1)
         #expect(entries1.count == 1)
         #expect(entries2.count == 1)
     }
@@ -1518,7 +1546,7 @@ struct LoggerConvenienceMethodsTests {
         await logger.flush()
         
         // Then: Entry is logged with debug level
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.level == .debug)
         #expect(entries.first?.message == "Debug message")
@@ -1553,7 +1581,7 @@ struct LoggerConvenienceMethodsTests {
         await logger.flush()
         
         // Then: Entry is logged with info level
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.level == .info)
     }
@@ -1587,7 +1615,7 @@ struct LoggerConvenienceMethodsTests {
         await logger.flush()
         
         // Then: Entry is logged with warning level
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.level == .warning)
     }
@@ -1621,7 +1649,7 @@ struct LoggerConvenienceMethodsTests {
         await logger.flush()
         
         // Then: Entry is logged with error level
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.level == .error)
     }
@@ -1655,7 +1683,7 @@ struct LoggerConvenienceMethodsTests {
         await logger.flush()
         
         // Then: Entry is logged with critical level
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.level == .critical)
     }
@@ -1689,7 +1717,7 @@ struct LoggerConvenienceMethodsTests {
         await logger.flush()
         
         // Then: Entry has custom category
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.category == .network)
     }
@@ -1727,7 +1755,7 @@ struct LoggerConvenienceMethodsTests {
         await logger.flush()
         
         // Then: Entry has metadata and pii
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(1)
         #expect(entries.count == 1)
         #expect(entries.first?.metadata["key"] != nil)
         #expect(entries.first?.pii["email"] != nil)
@@ -1783,7 +1811,7 @@ struct LoggingIntegrationTests {
         await logger.flush()
         
         // Then: Correct entries are logged with all features
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(2)
         #expect(entries.count == 2) // debug filtered out
         
         // And: First entry has all expected data
@@ -1842,7 +1870,7 @@ struct LoggingIntegrationTests {
         await logger.flush()
         
         // Then: All messages are logged
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(50)
         #expect(entries.count == 50)
         
         // And: All sequence numbers are unique
@@ -1895,7 +1923,7 @@ struct LoggingIntegrationTests {
         await logger.flush()
         
         // Then: Each entry has correct scope context
-        let entries = await destination.writtenEntries
+        let entries = await destination.waitForAtLeast(3)
         #expect(entries.count == 3)
         
         // And: All entries have request scope
