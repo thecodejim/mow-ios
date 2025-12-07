@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		8E2DDC802EE0C2C8005C6035 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8E2DDC7F2EE0C2C8005C6035 /* Localizable.xcstrings */; };
 		8E2DDC822EE0F5F7005C6035 /* DebugCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2DDC812EE0F5F7005C6035 /* DebugCopy.swift */; };
+		8E4F54362EE4D63900E078AB /* PersistenceServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4F54332EE4D63900E078AB /* PersistenceServices.swift */; };
+		8E4F54372EE4D63900E078AB /* SwiftDataHomeSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4F54342EE4D63900E078AB /* SwiftDataHomeSnapshotStore.swift */; };
 		8E5C87462ED765F30010B0F5 /* DeviceInfoService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5C87452ED765F30010B0F5 /* DeviceInfoService.swift */; };
 		8E645231BB7CF1001E /* TestMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E645231BB7C3B2014 /* TestMocks.swift */; };
 		8E645231BB7D26C01F /* StoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E645231BB7C703015 /* StoreTests.swift */; };
@@ -57,6 +59,8 @@
 		8E2DDC7F2EE0C2C8005C6035 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		8E2DDC812EE0F5F7005C6035 /* DebugCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugCopy.swift; sourceTree = "<group>"; };
 		8E31748A2ED2033000D35843 /* mow-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mow-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E4F54332EE4D63900E078AB /* PersistenceServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceServices.swift; sourceTree = "<group>"; };
+		8E4F54342EE4D63900E078AB /* SwiftDataHomeSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataHomeSnapshotStore.swift; sourceTree = "<group>"; };
 		8E5C87452ED765F30010B0F5 /* DeviceInfoService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoService.swift; sourceTree = "<group>"; };
 		8E645231BB7A036002 /* mow-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mow-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E645231BB7C3B2014 /* TestMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMocks.swift; sourceTree = "<group>"; };
@@ -140,6 +144,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		8E4F54352EE4D63900E078AB /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				8E4F54332EE4D63900E078AB /* PersistenceServices.swift */,
+				8E4F54342EE4D63900E078AB /* SwiftDataHomeSnapshotStore.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
 		8E645231BB7A405003 /* mow-iosTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -193,6 +206,7 @@
 				8ECEDBD32ED533EB00A79F73 /* Store.swift */,
 				8ECEDBD42ED533EB00A79F73 /* StoreScopes.swift */,
 				8EF000102FF5000100AAA001 /* Logging */,
+				8E4F54352EE4D63900E078AB /* Persistence */,
 				8ECEDBD12ED533EB00A79F73 /* Views */,
 			);
 			path = Core;
@@ -395,6 +409,8 @@
 				8ECEDBEE2ED533EB00A79F73 /* HomeViews.swift in Sources */,
 				8EC56E622ED6243900FA6B0F /* HomeDomain+Content.swift in Sources */,
 				8ECEDBEF2ED533EB00A79F73 /* LoginDomain.swift in Sources */,
+				8E4F54362EE4D63900E078AB /* PersistenceServices.swift in Sources */,
+				8E4F54372EE4D63900E078AB /* SwiftDataHomeSnapshotStore.swift in Sources */,
 				8ECEDBF02ED533EB00A79F73 /* LoginViews.swift in Sources */,
 				8EF100012FF5000100AAA001 /* LogTypes.swift in Sources */,
 				8EF100022FF5000100AAA001 /* LoggingConfiguration.swift in Sources */,

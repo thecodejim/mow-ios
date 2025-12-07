@@ -6,6 +6,7 @@ enum OnboardingDomain {
         let appEnvironment: AppEnvironment
         let analytics: AnalyticsService
         let logger: Logger
+        let onboardingStore: OnboardingProgressStoring
     }
 
     enum State: Equatable {
@@ -139,6 +140,7 @@ enum OnboardingDomain {
             guard case var .loaded(loadedState) = state else { return .none }
             loadedState.isCompleting = false
             state = .loaded(loadedState)
+            environment.onboardingStore.markCompleted()
             environment.logger.info(
                 "Onboarding finished",
                 category: .ui,

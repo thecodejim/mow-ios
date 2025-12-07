@@ -4,7 +4,7 @@ enum LoginDomain {
     struct Environment {
         let appEnvironment: AppEnvironment
         let api: APIService
-        let keychain: KeychainService
+        let sessionStore: SessionStoring
         let analytics: AnalyticsService
         let deviceInfo: DeviceInfoService
         let logger: Logger
@@ -191,7 +191,17 @@ enum LoginDomain {
             return .task {
                 do {
                     let session = try await environment.api.login(email: email, password: password)
-                    try await environment.keychain.save(token: session.token)
+                    do {
+                        try environment.sessionStore.store(session: session)
+                    } catch {
+                        environment.logger.error(
+                            "Persisting session failed",
+                            error: error,
+                            category: .auth,
+                            metadata: ["environment": .public(environment.appEnvironment.name.rawValue)]
+                        )
+                        return .loginResponse(.failure(.service(loginFallbackError)))
+                    }
                     await environment.analytics.track(event: LoginDomain.AnalyticsEvent.loginSuccess, metadata: [:])
                     environment.logger.info(
                         "Login succeeded",

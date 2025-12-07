@@ -8,11 +8,29 @@ actor TestMockAPIService: APIService {
     private(set) var resetCallCount = 0
     private(set) var fetchHomeCallCount = 0
     
-    var loginResult: Result<AuthSession, Error> = .success(
-        AuthSession(token: "test-token", displayName: "Test User")
-    )
-    var resetResult: Result<Void, Error> = .success(())
-    var homeSnapshotResult: Result<HomeSnapshot, Error> = .success(
+    var loginResult: Result<AuthSession, Error>
+    var resetResult: Result<Void, Error>
+    var homeSnapshotResult: Result<HomeSnapshot, Error>
+
+    init(
+        loginResult: Result<AuthSession, Error>,
+        resetResult: Result<Void, Error>,
+        homeSnapshotResult: Result<HomeSnapshot, Error>
+    ) {
+        self.loginResult = loginResult
+        self.resetResult = resetResult
+        self.homeSnapshotResult = homeSnapshotResult
+    }
+
+    @MainActor
+    init() {
+        self.loginResult = .success(AuthSession(token: "test-token", displayName: "Test User"))
+        self.resetResult = .success(())
+        self.homeSnapshotResult = .success(Self.makeDefaultSnapshot())
+    }
+
+    @MainActor
+    private static func makeDefaultSnapshot() -> HomeSnapshot {
         HomeSnapshot(
             headline: "Test headline",
             stats: [
@@ -27,7 +45,7 @@ actor TestMockAPIService: APIService {
             ],
             profile: .init(name: "Test Name", role: "Test Role", territory: "Test Territory")
         )
-    )
+    }
     
     func login(email: String, password: String) async throws -> AuthSession {
         loginCallCount += 1
@@ -69,40 +87,96 @@ actor TestMockAPIService: APIService {
     }
 }
 
-// MARK: - Test Mock Keychain Service
+// MARK: - Test Onboarding Store
 
-actor TestMockKeychainService: KeychainService {
-    private(set) var savedToken: String?
-    private(set) var saveCallCount = 0
+final class TestOnboardingStore: OnboardingProgressStoring {
+    private(set) var completed = false
+    private(set) var markCount = 0
+
+    func hasCompletedOnboarding() -> Bool {
+        completed
+    }
+
+    func markCompleted() {
+        markCount += 1
+        completed = true
+    }
+
+    func reset() {
+        completed = false
+        markCount = 0
+    }
+}
+
+// MARK: - Test Session Store
+
+final class TestSessionStore: SessionStoring {
+    private(set) var storedSession: AuthSession?
+    private(set) var storeCallCount = 0
     private(set) var clearCallCount = 0
-    
-    var saveResult: Result<Void, Error> = .success(())
+
+    var storeResult: Result<Void, Error> = .success(())
     var clearResult: Result<Void, Error> = .success(())
-    
-    func save(token: String) async throws {
-        saveCallCount += 1
-        
-        switch saveResult {
+
+    func store(session: AuthSession) throws {
+        storeCallCount += 1
+        switch storeResult {
         case .success:
-            savedToken = token
+            storedSession = session
         case .failure(let error):
             throw error
         }
     }
-    
-    func clear() async throws {
+
+    func loadSession() throws -> AuthSession? {
+        storedSession
+    }
+
+    func clearSession() throws {
         clearCallCount += 1
-        
         switch clearResult {
         case .success:
-            savedToken = nil
+            storedSession = nil
         case .failure(let error):
             throw error
         }
     }
-    
+
     func reset() {
-        savedToken = nil
+        storedSession = nil
+        storeCallCount = 0
+        clearCallCount = 0
+        storeResult = .success(())
+        clearResult = .success(())
+    }
+}
+
+// MARK: - Test Home Snapshot Store
+
+actor TestHomeSnapshotStore: HomeSnapshotStoring {
+    private(set) var snapshot: HomeSnapshot?
+    private(set) var loadCallCount = 0
+    private(set) var saveCallCount = 0
+    private(set) var clearCallCount = 0
+
+    func latestSnapshot() async throws -> HomeSnapshot? {
+        loadCallCount += 1
+        return snapshot
+    }
+
+    func save(_ snapshot: HomeSnapshot) async throws {
+        saveCallCount += 1
+        self.snapshot = snapshot
+    }
+
+    func clear() async throws {
+        clearCallCount += 1
+        snapshot = nil
+    }
+
+    func reset() {
+        snapshot = nil
+        loadCallCount = 0
         saveCallCount = 0
         clearCallCount = 0
     }
@@ -203,7 +277,9 @@ func createTestAppEnvironment() -> AppDomain.Environment {
     let logger = TestMockLogger()
     let logHistory = MockLogHistoryProvider()
     let api = TestMockAPIService()
-    let keychain = TestMockKeychainService()
+    let onboardingStore = TestOnboardingStore()
+    let sessionStore = TestSessionStore()
+    let homeSnapshotStore = TestHomeSnapshotStore()
     let analytics = TestMockAnalyticsService()
     let deviceInfo = MockDeviceInfoService()
     let appEnv = AppEnvironment.makeTestEnvironment()
@@ -213,12 +289,13 @@ func createTestAppEnvironment() -> AppDomain.Environment {
         onboarding: OnboardingDomain.Environment(
             appEnvironment: appEnv,
             analytics: analytics,
-            logger: logger
+            logger: logger,
+            onboardingStore: onboardingStore
         ),
         login: LoginDomain.Environment(
             appEnvironment: appEnv,
             api: api,
-            keychain: keychain,
+            sessionStore: sessionStore,
             analytics: analytics,
             deviceInfo: deviceInfo,
             logger: logger,
@@ -229,8 +306,11 @@ func createTestAppEnvironment() -> AppDomain.Environment {
             api: api,
             deviceInfo: deviceInfo,
             logger: logger,
-            logHistory: logHistory
+            logHistory: logHistory,
+            homeSnapshotStore: homeSnapshotStore
         ),
-        logger: logger
+        logger: logger,
+        sessionStore: sessionStore,
+        homeSnapshotStore: homeSnapshotStore
     )
 }

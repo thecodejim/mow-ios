@@ -7,13 +7,27 @@ enum AppDomain {
         let login: LoginDomain.Environment
         let home: HomeDomain.Environment
         let logger: Logger
+        let sessionStore: SessionStoring
+        let homeSnapshotStore: HomeSnapshotStoring
     }
 
     struct State: Equatable {
-        var onboarding: OnboardingDomain.State = .init()
-        var login: LoginDomain.State = .init()
-        var home: HomeDomain.State = .init()
-        var route: Route = .onboarding
+        var onboarding: OnboardingDomain.State
+        var login: LoginDomain.State
+        var home: HomeDomain.State
+        var route: Route
+
+        init(
+            onboarding: OnboardingDomain.State = .init(),
+            login: LoginDomain.State = .init(),
+            home: HomeDomain.State = .init(),
+            route: Route = .onboarding
+        ) {
+            self.onboarding = onboarding
+            self.login = login
+            self.home = home
+            self.route = route
+        }
 
         enum Route: Equatable {
             case onboarding
@@ -98,7 +112,9 @@ enum AppDomain {
                 category: .coordinator,
                 metadata: ["targetRoute": .public(state.route.label)]
             )
-            return .none
+            return .fireAndForget {
+                await environment.clearPersistentSession(reason: "login_logout")
+            }
 
         case let .login(childAction):
             guard state.route == .login else { return .none }
@@ -120,7 +136,9 @@ enum AppDomain {
                 category: .coordinator,
                 metadata: ["targetRoute": .public(state.route.label)]
             )
-            return .none
+            return .fireAndForget {
+                await environment.clearPersistentSession(reason: "home_logout")
+            }
 
         case let .home(childAction):
             guard state.route == .home else { return .none }
@@ -131,6 +149,32 @@ enum AppDomain {
                 environment: environment.home
             )
             return effect.map(Action.home)
+        }
+    }
+}
+
+private extension AppDomain.Environment {
+    func clearPersistentSession(reason: String) async {
+        do {
+            try sessionStore.clearSession()
+        } catch {
+            logger.error(
+                "Failed to clear session",
+                error: error,
+                category: .auth,
+                metadata: ["reason": .public(reason)]
+            )
+        }
+
+        do {
+            try await homeSnapshotStore.clear()
+        } catch {
+            logger.error(
+                "Failed to clear cached home snapshot",
+                error: error,
+                category: .businessLogic,
+                metadata: ["reason": .public(reason)]
+            )
         }
     }
 }

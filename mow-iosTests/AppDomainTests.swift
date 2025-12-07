@@ -18,12 +18,13 @@ struct AppDomainTests {
             onboarding: OnboardingDomain.Environment(
                 appEnvironment: env.appEnvironment,
                 analytics: env.onboarding.analytics,
-                logger: logger
+                logger: logger,
+                onboardingStore: env.onboarding.onboardingStore
             ),
             login: LoginDomain.Environment(
                 appEnvironment: env.appEnvironment,
                 api: env.login.api,
-                keychain: env.login.keychain,
+                sessionStore: env.login.sessionStore,
                 analytics: env.login.analytics,
                 deviceInfo: env.login.deviceInfo,
                 logger: logger,
@@ -34,9 +35,12 @@ struct AppDomainTests {
                 api: env.home.api,
                 deviceInfo: env.home.deviceInfo,
                 logger: logger,
-                logHistory: env.home.logHistory
+                logHistory: env.home.logHistory,
+                homeSnapshotStore: env.home.homeSnapshotStore
             ),
-            logger: logger
+            logger: logger,
+            sessionStore: env.sessionStore,
+            homeSnapshotStore: env.homeSnapshotStore
         )
         self.environment = env
     }

@@ -13,17 +13,19 @@ final class AppCoordinator: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
 
     init(dependencies: AppDependencies) {
+        let initialRoute = AppCoordinator.resolveInitialRoute(using: dependencies)
         let environment = AppDomain.Environment(
             appEnvironment: dependencies.environment,
             onboarding: .init(
                 appEnvironment: dependencies.environment,
                 analytics: dependencies.analytics,
-                logger: dependencies.logger
+                logger: dependencies.logger,
+                onboardingStore: dependencies.onboardingStore
             ),
             login: .init(
                 appEnvironment: dependencies.environment,
                 api: dependencies.api,
-                keychain: dependencies.keychain,
+                sessionStore: dependencies.sessionStore,
                 analytics: dependencies.analytics,
                 deviceInfo: dependencies.deviceInfo,
                 logger: dependencies.logger,
@@ -34,12 +36,15 @@ final class AppCoordinator: ObservableObject {
                 api: dependencies.api,
                 deviceInfo: dependencies.deviceInfo,
                 logger: dependencies.logger,
-                logHistory: dependencies.logHistory
+                logHistory: dependencies.logHistory,
+                homeSnapshotStore: dependencies.homeSnapshotStore
             ),
-            logger: dependencies.logger
+            logger: dependencies.logger,
+            sessionStore: dependencies.sessionStore,
+            homeSnapshotStore: dependencies.homeSnapshotStore
         )
 
-        store = Store(initialState: .init(), environment: environment, reducer: AppDomain.reducer)
+        store = Store(initialState: .init(route: initialRoute), environment: environment, reducer: AppDomain.reducer)
         route = store.state.route
 
         onboardingStore = store.scope(
@@ -67,5 +72,27 @@ final class AppCoordinator: ObservableObject {
                 self?.route = route
             }
             .store(in: &cancellables)
+    }
+}
+
+private extension AppCoordinator {
+    static func resolveInitialRoute(using dependencies: AppDependencies) -> AppDomain.State.Route {
+        do {
+            if try dependencies.sessionStore.loadSession() != nil {
+                return .home
+            }
+        } catch {
+            dependencies.logger.error(
+                "Failed to load persisted session",
+                error: error,
+                category: .auth
+            )
+        }
+
+        if dependencies.onboardingStore.hasCompletedOnboarding() {
+            return .login
+        }
+
+        return .onboarding
     }
 }

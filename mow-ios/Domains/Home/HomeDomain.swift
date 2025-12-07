@@ -7,6 +7,7 @@ enum HomeDomain {
         let deviceInfo: DeviceInfoService
         let logger: Logger
         let logHistory: LogHistoryProviding
+        let homeSnapshotStore: HomeSnapshotStoring
     }
 
     enum Tab: String, CaseIterable {
@@ -105,6 +106,7 @@ enum HomeDomain {
         case selectTab(Tab)
         case refresh
         case refreshResponse(Result<HomeSnapshot, DomainError>)
+        case cacheLoaded(HomeSnapshot, shouldRefresh: Bool)
         case logoutTapped
         case clearAlert
         case setDebugInfoPresented(Bool)
@@ -115,16 +117,31 @@ enum HomeDomain {
     static func reducer(state: inout State, action: Action, environment: Environment) -> Effect<Action> {
         switch action {
         case .onAppear:
+            let shouldRefresh: Bool
             switch state {
             case .loading:
-                return .send(.refresh)
+                shouldRefresh = true
             case let .loaded(loadedState):
-                guard loadedState.dashboard.stats.isEmpty else { return .none }
-                return .send(.refresh)
+                shouldRefresh = loadedState.dashboard.stats.isEmpty
             case .refreshing:
-                return .none
+                shouldRefresh = false
             case .error:
-                return .send(.refresh)
+                shouldRefresh = true
+            }
+
+            return Effect {
+                do {
+                    if let snapshot = try await environment.homeSnapshotStore.latestSnapshot() {
+                        return .cacheLoaded(snapshot, shouldRefresh: shouldRefresh)
+                    }
+                } catch {
+                    environment.logger.error(
+                        "Failed to load cached home snapshot",
+                        error: error,
+                        category: .businessLogic
+                    )
+                }
+                return shouldRefresh ? .refresh : nil
             }
 
         case let .selectTab(tab):
@@ -136,6 +153,21 @@ enum HomeDomain {
                 state = .refreshing(loadedState)
             }
             return .none
+
+        case let .cacheLoaded(snapshot, shouldRefresh):
+            var loadedState = state.resolvedLoadedState()
+            loadedState.apply(snapshot: snapshot)
+            state = .loaded(loadedState)
+            environment.logger.info(
+                "Hydrated home from cache",
+                category: .businessLogic,
+                metadata: [
+                    "stats": .public(snapshot.stats.count),
+                    "meals": .public(snapshot.meals.count),
+                    "deliveries": .public(snapshot.deliveries.count)
+                ]
+            )
+            return shouldRefresh ? .send(.refresh) : .none
 
         case .refresh:
             switch state {
@@ -181,26 +213,8 @@ enum HomeDomain {
         case let .refreshResponse(result):
             switch result {
             case let .success(snapshot):
-                var loadedState: State.LoadedState
-                if case let .refreshing(current) = state {
-                    loadedState = current
-                } else if case let .loaded(current) = state {
-                    loadedState = current
-                } else if case let .error(errorState) = state, let previous = errorState.previousState {
-                    loadedState = previous
-                } else {
-                    loadedState = .init()
-                }
-
-                loadedState.dashboard.headline = snapshot.headline
-                loadedState.dashboard.stats = snapshot.stats.map { .init(label: $0.label, value: $0.value, trend: $0.trend) }
-                loadedState.meals.items = snapshot.meals.map { .init(title: $0.title, calories: $0.calories, deliveryTime: $0.deliveryTime) }
-                loadedState.deliveries.items = snapshot.deliveries.map { .init(recipient: $0.recipient, address: $0.address, distance: $0.distanceMiles) }
-                loadedState.profile.name = snapshot.profile.name
-                loadedState.profile.role = snapshot.profile.role
-                loadedState.profile.territory = snapshot.profile.territory
-                loadedState.alertMessage = nil
-
+                var loadedState = state.resolvedLoadedState()
+                loadedState.apply(snapshot: snapshot)
                 state = .loaded(loadedState)
                 environment.logger.info(
                     "Home refresh succeeded",
@@ -211,6 +225,17 @@ enum HomeDomain {
                         "deliveries": .public(snapshot.deliveries.count)
                     ]
                 )
+                return .fireAndForget {
+                    do {
+                        try await environment.homeSnapshotStore.save(snapshot)
+                    } catch {
+                        environment.logger.error(
+                            "Failed to cache home snapshot",
+                            error: error,
+                            category: .businessLogic
+                        )
+                    }
+                }
 
             case let .failure(error):
                 switch state {
@@ -263,6 +288,36 @@ enum HomeDomain {
         case .delegate:
             return .none
         }
+    }
+}
+
+private extension HomeDomain.State {
+    func resolvedLoadedState() -> LoadedState {
+        switch self {
+        case let .refreshing(current):
+            return current
+        case let .loaded(current):
+            return current
+        case let .error(errorState):
+            return errorState.previousState ?? .init()
+        case .loading:
+            return .init()
+        }
+    }
+}
+
+private extension HomeDomain.State.LoadedState {
+    mutating func apply(snapshot: HomeSnapshot) {
+        dashboard.headline = snapshot.headline
+        dashboard.stats = snapshot.stats.map { .init(label: $0.label, value: $0.value, trend: $0.trend) }
+        meals.items = snapshot.meals.map { .init(title: $0.title, calories: $0.calories, deliveryTime: $0.deliveryTime) }
+        deliveries.items = snapshot.deliveries.map {
+            .init(recipient: $0.recipient, address: $0.address, distance: $0.distanceMiles)
+        }
+        profile.name = snapshot.profile.name
+        profile.role = snapshot.profile.role
+        profile.territory = snapshot.profile.territory
+        alertMessage = nil
     }
 }
 
