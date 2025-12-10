@@ -377,7 +377,7 @@ private struct TestState: Equatable {
     var count: Int = 0
 }
 
-private enum TestAction: Equatable {
+private enum TestAction: Equatable, Sendable {
     case increment
     case setValue(Int)
     case incrementWithEffect
@@ -421,12 +421,12 @@ private struct ChildState: Equatable {
     var value: Int
 }
 
-private enum ParentAction: Equatable {
+private enum ParentAction: Equatable, Sendable {
     case child(ChildAction)
     case incrementUnrelatedCounter
 }
 
-private enum ChildAction: Equatable {
+private enum ChildAction: Equatable, Sendable {
     case updateName(String)
     case incrementValue
 }

@@ -1,13 +1,13 @@
 import Foundation
 
-struct LoggingConfiguration: Sendable {
-    struct DestinationConfiguration: Sendable {
-        struct Console: Sendable {
+struct LoggingConfiguration {
+    struct DestinationConfiguration {
+        struct Console {
             let isEnabled: Bool
             let showIcon: Bool
         }
 
-        struct File: Sendable {
+        struct File {
             let isEnabled: Bool
             let maxFileBytes: Int
             let maxFiles: Int // max rotated archives - active file will be +1
@@ -19,7 +19,7 @@ struct LoggingConfiguration: Sendable {
         let inMemoryEntryLimit: Int
     }
 
-    struct PIIBehavior: Sendable {
+    struct PIIBehavior {
         let captureHashes: Bool
     }
 

@@ -1,42 +1,66 @@
 import Combine
 
-struct Effect<Action> {
-    private let operation: () async -> Action?
+struct Effect<Action: Sendable>: Sendable {
+    typealias Operation = @Sendable () async -> Action?
 
-    init(operation: @escaping () async -> Action?) {
+    private let priority: TaskPriority
+    private let operation: Operation?
+
+    init(priority: TaskPriority = .userInitiated, operation: Operation? = nil) {
+        self.priority = priority
         self.operation = operation
     }
 
     func run() async -> Action? {
-        await operation()
+        guard let operation else { return nil }
+        return await operation()
+    }
+
+    func run(send: @MainActor @escaping (Action) -> Void) {
+        guard let operation else { return }
+
+        Task.detached(priority: priority) {
+            guard let action = await operation() else { return }
+            await MainActor.run {
+                send(action)
+            }
+        }
     }
 
     static var none: Effect {
-        Effect { nil }
+        Effect(operation: nil)
     }
 
     static func send(_ action: Action) -> Effect {
-        Effect { action }
+        Effect {
+            action
+        }
     }
 
-    static func task(_ work: @escaping () async -> Action) -> Effect {
-        Effect {
+    static func task(
+        priority: TaskPriority = .userInitiated,
+        _ work: @escaping @Sendable () async -> Action
+    ) -> Effect {
+        Effect(priority: priority) {
             await work()
         }
     }
 
-    static func fireAndForget(_ work: @escaping () async -> Void) -> Effect {
-        Effect {
+    static func fireAndForget(
+        priority: TaskPriority = .userInitiated,
+        _ work: @escaping @Sendable () async -> Void
+    ) -> Effect {
+        Effect(priority: priority) {
             await work()
             return nil
         }
     }
 }
 
-typealias Reducer<State, Action, Environment> = (inout State, Action, Environment) -> Effect<Action>
+typealias Reducer<State, Action: Sendable, Environment> = (inout State, Action, Environment) -> Effect<Action>
 
 @MainActor
-final class Store<State, Action, Environment>: ObservableObject {
+final class Store<State, Action: Sendable, Environment>: ObservableObject {
     @Published private(set) var state: State
     let environment: Environment
     private let reducer: Reducer<State, Action, Environment>
@@ -62,16 +86,8 @@ final class Store<State, Action, Environment>: ObservableObject {
     /// Public entry point for sending actions.
     /// Reducer runs synchronously on the main actor; effects are detached.
     func send(_ action: Action) {
-        // 1. Run reducer immediately on the main actor
         let effect = reducer(&state, action, environment)
-
-        // 2. Run the effect asynchronously; it can send follow-up actions
-        Task { @MainActor [weak self] in
-            guard let self else { return }
-            if let next = await effect.run() {
-                self.send(next)
-            }
-        }
+        effect.run(send: self.send)
     }
 
     func scope<ChildState, ChildEnvironment, ChildAction>(
@@ -91,11 +107,11 @@ final class Store<State, Action, Environment>: ObservableObject {
 @MainActor
 final class StoreScope<
     ParentState,
-    ParentAction,
+    ParentAction: Sendable,
     ParentEnvironment,
     ChildState: Equatable,
     ChildEnvironment,
-    ChildAction
+    ChildAction: Sendable
 >: ObservableObject {
 
     @Published fileprivate(set) var state: ChildState
@@ -138,12 +154,12 @@ final class StoreScope<
 }
 
 extension Effect {
-    func map<T>(_ transform: @escaping (Action) -> T) -> Effect<T> {
-        Effect<T> {
-            if let action = await run() {
-                return transform(action)
-            }
-            return nil
+    func map<T: Sendable>(_ transform: @escaping @Sendable (Action) -> T) -> Effect<T> {
+        guard let operation else { return .none }
+
+        return Effect<T>(priority: priority) {
+            guard let action = await operation() else { return nil }
+            return transform(action)
         }
     }
 }

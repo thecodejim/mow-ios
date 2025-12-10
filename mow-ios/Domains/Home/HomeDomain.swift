@@ -135,7 +135,7 @@ enum HomeDomain {
                         return .cacheLoaded(snapshot, shouldRefresh: shouldRefresh)
                     }
                 } catch {
-                    environment.logger.error(
+                    await environment.logger.error(
                         "Failed to load cached home snapshot",
                         error: error,
                         category: .businessLogic
@@ -200,7 +200,7 @@ enum HomeDomain {
                     return .refreshResponse(.success(snapshot))
                 } catch {
                     let message = (error as? LocalizedError)?.errorDescription ?? refreshFallbackError
-                    environment.logger.error(
+                    await environment.logger.error(
                         "Home refresh failed",
                         error: error,
                         category: .businessLogic,
@@ -229,7 +229,7 @@ enum HomeDomain {
                     do {
                         try await environment.homeSnapshotStore.save(snapshot)
                     } catch {
-                        environment.logger.error(
+                        await environment.logger.error(
                             "Failed to cache home snapshot",
                             error: error,
                             category: .businessLogic

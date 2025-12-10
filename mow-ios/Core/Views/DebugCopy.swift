@@ -93,4 +93,3 @@ enum LogViewerCopy {
         "\(key): \(value)"
     }
 }
-

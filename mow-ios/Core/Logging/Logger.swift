@@ -113,7 +113,7 @@ extension Logger {
 
 // MARK: - Default logger
 
-final class DefaultLogger: Logger, Sendable {
+struct DefaultLogger: Logger {
     private let configuration: LoggingConfiguration
     private let pipeline: LogPipeline
     private let scopeMetadata: LogMetadataFields
@@ -227,7 +227,7 @@ final class DefaultLogger: Logger, Sendable {
 
 // MARK: - Pipeline
 
-final class LogPipeline: Sendable {
+struct LogPipeline {
     private let worker: Worker
 
     init(destinations: [LogDestination]) {
@@ -278,7 +278,7 @@ final class LogPipeline: Sendable {
 
 // MARK: - Sequence Generator
 
-final class LogSequenceGenerator: Sendable {
+struct LogSequenceGenerator {
     private let lock = OSAllocatedUnfairLock<UInt64>(initialState: 0)
 
     func next() -> UInt64 {

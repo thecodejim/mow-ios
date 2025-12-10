@@ -9,7 +9,7 @@ protocol DataStoring {
     func delete(key: String) throws
 }
 
-final class UserDefaultsDataStore: DataStoring {
+struct UserDefaultsDataStore: DataStoring {
     private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
@@ -45,7 +45,7 @@ extension KeychainStoreError: LocalizedError {
     }
 }
 
-final class KeychainDataStore: DataStoring {
+struct KeychainDataStore: DataStoring {
     private let service: String
 
     init(service: String) {
@@ -130,7 +130,7 @@ extension CodableStoreError: LocalizedError {
     }
 }
 
-final class CodableStore<Value: Codable> {
+struct CodableStore<Value: Codable> {
     private let dataStore: DataStoring
     private let key: String
     private let encoder: JSONEncoder
@@ -202,13 +202,13 @@ final class CodableStore<Value: Codable> {
 
 // MARK: - Domain-facing stores
 
-protocol OnboardingProgressStoring: AnyObject {
+protocol OnboardingProgressStoring: Sendable {
     func hasCompletedOnboarding() -> Bool
     func markCompleted()
     func reset()
 }
 
-final class UserDefaultsOnboardingStore: OnboardingProgressStoring {
+struct UserDefaultsOnboardingStore: OnboardingProgressStoring {
     private let store: CodableStore<Bool>
 
     init(defaults: UserDefaults = .standard, key: String = "onboarding.completed") {
@@ -229,7 +229,7 @@ final class UserDefaultsOnboardingStore: OnboardingProgressStoring {
     }
 }
 
-protocol SessionStoring: AnyObject {
+protocol SessionStoring: Sendable {
     func store(session: AuthSession) throws
     func loadSession() throws -> AuthSession?
     func clearSession() throws
@@ -286,7 +286,7 @@ extension SessionStoreError: LocalizedError {
     }
 }
 
-final class KeychainSessionStore: SessionStoring {
+struct KeychainSessionStore: SessionStoring {
     private let store: CodableStore<AuthSession>
 
     init(service: String, account: String = "auth.session") {
@@ -323,4 +323,3 @@ final class KeychainSessionStore: SessionStoring {
         }
     }
 }
-

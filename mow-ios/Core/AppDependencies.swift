@@ -1,12 +1,12 @@
 import Foundation
 
-protocol APIService {
+protocol APIService: Sendable {
     func login(email: String, password: String) async throws -> AuthSession
     func sendPasswordReset(email: String) async throws
     func fetchHomeSnapshot() async throws -> HomeSnapshot
 }
 
-protocol AnalyticsService {
+protocol AnalyticsService: Sendable {
     func track(event: String, metadata: [String: String]) async
 }
 

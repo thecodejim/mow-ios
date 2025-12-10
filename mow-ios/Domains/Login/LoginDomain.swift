@@ -192,9 +192,9 @@ enum LoginDomain {
                 do {
                     let session = try await environment.api.login(email: email, password: password)
                     do {
-                        try environment.sessionStore.store(session: session)
+                        try await environment.sessionStore.store(session: session)
                     } catch {
-                        environment.logger.error(
+                        await environment.logger.error(
                             "Persisting session failed",
                             error: error,
                             category: .auth,
@@ -203,7 +203,7 @@ enum LoginDomain {
                         return .loginResponse(.failure(.service(loginFallbackError)))
                     }
                     await environment.analytics.track(event: LoginDomain.AnalyticsEvent.loginSuccess, metadata: [:])
-                    environment.logger.info(
+                    await environment.logger.info(
                         "Login succeeded",
                         category: .auth,
                         metadata: ["displayName": .public(session.displayName)],
@@ -216,7 +216,7 @@ enum LoginDomain {
                         event: LoginDomain.AnalyticsEvent.loginFailure,
                         metadata: ["reason": message]
                     )
-                    environment.logger.error(
+                    await environment.logger.error(
                         "Login failed",
                         error: error,
                         category: .auth,
@@ -291,7 +291,7 @@ enum LoginDomain {
                 do {
                     try await environment.api.sendPasswordReset(email: email)
                     await environment.analytics.track(event: LoginDomain.AnalyticsEvent.resetRequested, metadata: [:])
-                    environment.logger.info(
+                    await environment.logger.info(
                         "Password reset email sent",
                         category: .auth,
                         pii: ["email": .email(email)]
@@ -299,7 +299,7 @@ enum LoginDomain {
                     return .resetResponse(.success)
                 } catch {
                     let message = (error as? LocalizedError)?.errorDescription ?? resetFallbackError
-                    environment.logger.error(
+                    await environment.logger.error(
                         "Password reset failed",
                         error: error,
                         category: .auth,

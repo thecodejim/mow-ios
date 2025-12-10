@@ -163,7 +163,7 @@ final class AsyncCodableStore<Value: Codable> {
 
 // MARK: - Domain store
 
-protocol HomeSnapshotStoring: AnyObject {
+protocol HomeSnapshotStoring: AnyObject, Sendable {
     func latestSnapshot() async throws -> HomeSnapshot?
     func save(_ snapshot: HomeSnapshot) async throws
     func clear() async throws

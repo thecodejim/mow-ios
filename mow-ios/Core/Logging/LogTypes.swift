@@ -3,7 +3,7 @@ import Foundation
 
 // MARK: - Levels
 
-enum LogLevel: Int, Comparable, Codable, CaseIterable, Sendable {
+enum LogLevel: Int, Comparable, Codable, CaseIterable {
     case trace = 0
     case debug = 10
     case info = 20
@@ -40,7 +40,7 @@ enum LogLevel: Int, Comparable, Codable, CaseIterable, Sendable {
 
 // MARK: - Categories
 
-struct LogCategory: RawRepresentable, Hashable, Codable, ExpressibleByStringLiteral, Sendable {
+struct LogCategory: RawRepresentable, Hashable, Codable, ExpressibleByStringLiteral {
     let rawValue: String
 
     init(rawValue: String) {
@@ -75,7 +75,7 @@ extension LogCategory: Identifiable {
 
 // MARK: - Log Value Encoding
 
-enum LogValue: Codable, Sendable {
+enum LogValue: Codable {
     case string(String)
     case int(Int)
     case double(Double)
@@ -248,7 +248,7 @@ extension Dictionary: LogValueConvertible where Key == String, Value: LogValueCo
     }
 }
 
-enum LogFieldValue: Sendable {
+enum LogFieldValue {
     case value(LogValue)
     case pii(PIIValue)
 
@@ -265,7 +265,7 @@ typealias LogMetadataFields = [String: LogFieldValue]
 
 // MARK: - PII
 
-struct PIIValue: Sendable, Equatable {
+struct PIIValue: Equatable {
     enum Kind: String, Codable {
         case email
         case phone
@@ -370,7 +370,7 @@ private extension Digest {
     }
 }
 
-struct LogPIIRepresentation: Codable, Sendable {
+struct LogPIIRepresentation: Codable {
     let kind: PIIValue.Kind
     let redacted: String
     let hash: String?
@@ -378,7 +378,7 @@ struct LogPIIRepresentation: Codable, Sendable {
 
 // MARK: - Entry & Source
 
-struct LogSource: Codable, Sendable {
+struct LogSource: Codable {
     let file: String
     let function: String
     let line: UInt
@@ -392,7 +392,7 @@ struct LogSource: Codable, Sendable {
     }
 }
 
-struct LogEntry: Identifiable, Codable, Sendable {
+struct LogEntry: Identifiable, Codable {
     let id: UUID
     let timestamp: Date
     let level: LogLevel

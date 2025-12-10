@@ -8,7 +8,7 @@ protocol LogDestination: Sendable {
 
 // MARK: - Console
 
-final class ConsoleLogDestination: LogDestination {
+struct ConsoleLogDestination: LogDestination {
     private let subsystem: String
     private let showIcon: Bool
     private let logger: os.Logger

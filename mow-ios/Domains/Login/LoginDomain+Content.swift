@@ -73,4 +73,3 @@ extension LoginDomain.State.LoginForm {
     static let defaultPassword = "password"
     static let minPasswordLength = 4
 }
-
