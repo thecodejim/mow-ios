@@ -2,6 +2,18 @@ import Testing
 import Foundation
 @testable import mow_ios
 
+actor ExecutionFlag {
+    private var value = false
+
+    func markExecuted() {
+        value = true
+    }
+
+    func didExecute() -> Bool {
+        value
+    }
+}
+
 // MARK: - Effect Tests
 
 @Suite("Effect Tests")
@@ -36,9 +48,9 @@ struct EffectTests {
     @Test("Effect.task executes work and returns result")
     func taskExecutesWorkAndReturnsResult() async {
         // Given: A task effect that performs async work
-        var workExecuted = false
+        let flag = ExecutionFlag()
         let effect = Effect<String>.task {
-            workExecuted = true
+            await flag.markExecuted()
             return "WorkCompleted"
         }
         
@@ -46,6 +58,7 @@ struct EffectTests {
         let result = await effect.run()
         
         // Then: The work is executed and result is returned
+        let workExecuted = await flag.didExecute()
         #expect(workExecuted == true)
         #expect(result == "WorkCompleted")
     }
@@ -53,15 +66,16 @@ struct EffectTests {
     @Test("Effect.fireAndForget executes work and returns nil")
     func fireAndForgetExecutesWorkAndReturnsNil() async {
         // Given: A fire-and-forget effect
-        var workExecuted = false
+        let flag = ExecutionFlag()
         let effect = Effect<String>.fireAndForget {
-            workExecuted = true
+            await flag.markExecuted()
         }
         
         // When: The effect is run
         let result = await effect.run()
         
         // Then: Work is executed but no action is returned
+        let workExecuted = await flag.didExecute()
         #expect(workExecuted == true)
         #expect(result == nil)
     }

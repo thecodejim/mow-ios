@@ -108,6 +108,8 @@ final class TestOnboardingStore: OnboardingProgressStoring {
     }
 }
 
+extension TestOnboardingStore: @unchecked Sendable {}
+
 // MARK: - Test Session Store
 
 final class TestSessionStore: SessionStoring {
@@ -150,6 +152,8 @@ final class TestSessionStore: SessionStoring {
         clearResult = .success(())
     }
 }
+
+extension TestSessionStore: @unchecked Sendable {}
 
 // MARK: - Test Home Snapshot Store
 
