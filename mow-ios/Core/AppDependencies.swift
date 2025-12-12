@@ -57,6 +57,7 @@ struct AppDependencies {
             logger: logging.logger,
             logHistory: logging.history,
             api: MockAPIService(),
+//            api: LiveAPIService(baseURL: environment.apiBaseURL), // TODO: use live api service once backend is up
             analytics: MockAnalyticsService(),
             deviceInfo: LiveDeviceInfoService(),
             onboardingStore: onboardingStore,
