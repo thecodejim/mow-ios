@@ -150,18 +150,19 @@ enum LoginDomain {
         case .submit:
             var loadedState = state.currentLoadedState()
 
-            guard loadedState.form.email.isValidEmail else {
-                state = .error(.init(
-                    form: loadedState.form,
-                    message: LoginDomain.Copy.invalidEmail,
-                    isShowingDebugInfo: loadedState.isShowingDebugInfo
-                ))
-                environment.logger.info(
-                    "Login validation failed: invalid email",
-                    category: .auth
-                )
-                return .none
-            }
+            // TODO: enable this once we switch over to email
+//            guard loadedState.form.email.isValidEmail else {
+//                state = .error(.init(
+//                    form: loadedState.form,
+//                    message: LoginDomain.Copy.invalidEmail,
+//                    isShowingDebugInfo: loadedState.isShowingDebugInfo
+//                ))
+//                environment.logger.info(
+//                    "Login validation failed: invalid email",
+//                    category: .auth
+//                )
+//                return .none
+//            }
 
             guard loadedState.form.password.count >= LoginDomain.State.LoginForm.minPasswordLength else {
                 state = .error(.init(

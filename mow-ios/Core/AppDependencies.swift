@@ -51,13 +51,20 @@ struct AppDependencies {
         )
         let sessionStore = KeychainSessionStore(service: environment.bundleIdentifier)
         let homeSnapshotStore = SwiftDataHomeSnapshotStore.makeDefault(for: environment)
+        
+        var session: URLSession
+        #if DEBUG
+        let delegate = DebugTrustingSessionDelegate(allowedHosts: ["portal.localhost"])
+        session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
+        #else
+        session = URLSession(configuration: .default)
+        #endif
 
         return AppDependencies(
             environment: environment,
             logger: logging.logger,
             logHistory: logging.history,
-            api: MockAPIService(),
-//            api: LiveAPIService(baseURL: environment.apiBaseURL), // TODO: use live api service once backend is up
+            api: LiveAPIService(baseURL: environment.apiBaseURL, session: session),
             analytics: MockAnalyticsService(),
             deviceInfo: LiveDeviceInfoService(),
             onboardingStore: onboardingStore,
@@ -282,3 +289,40 @@ actor InMemoryHomeSnapshotStore: HomeSnapshotStoring {
         snapshot = nil
     }
 }
+
+#if DEBUG
+final class DebugTrustingSessionDelegate: NSObject, URLSessionDelegate {
+    /// Only bypass trust for these hosts (avoid accidentally trusting everything).
+    private let allowedHosts: Set<String>
+
+    init(allowedHosts: Set<String> = ["portal.localhost"]) {
+        self.allowedHosts = allowedHosts
+        super.init()
+    }
+
+    func urlSession(
+        _ session: URLSession,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+    ) {
+        // We only care about TLS server trust challenges
+        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+              let serverTrust = challenge.protectionSpace.serverTrust else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+
+        let host = challenge.protectionSpace.host.lowercased()
+
+        // Only bypass for local dev host(s)
+        guard allowedHosts.contains(host) else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+
+        // Accept the presented certificate chain (DEBUG ONLY)
+        let credential = URLCredential(trust: serverTrust)
+        completionHandler(.useCredential, credential)
+    }
+}
+#endif

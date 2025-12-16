@@ -12,7 +12,7 @@ struct LiveAPIService: APIService {
     }
     
     func login(email: String, password: String) async throws -> AuthSession {
-        let endpoint = baseURL.appendingPathComponent("api/v1/auth/jwt/create/")
+        let endpoint = baseURL.appendingPathComponent("auth/jwt/create/")
         
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
@@ -148,5 +148,3 @@ enum APIError: Error, LocalizedError, Equatable {
         }
     }
 }
-
-

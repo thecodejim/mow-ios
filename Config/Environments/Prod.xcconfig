@@ -3,7 +3,7 @@
 APP_ENVIRONMENT_NAME = prod
 APP_SWIFT_FLAGS      = ENV_PROD
 API_SCHEME           = https
-API_HOST_AND_PATH    = api.mow.codejim.com/api/v1
+API_HOST_AND_PATH    = portal.mow.codejim.com/api/v1
 DOCS_SCHEME          = https
 DOCS_HOST            = developer.mow.codejim.com
 PORTAL_SCHEME        = https

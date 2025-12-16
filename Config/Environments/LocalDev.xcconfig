@@ -2,8 +2,8 @@
 
 APP_ENVIRONMENT_NAME = local-dev
 APP_SWIFT_FLAGS      = ENV_LOCAL_DEV
-API_SCHEME           = http
-API_HOST_AND_PATH    = localhost:8000/api/v1
+API_SCHEME           = https
+API_HOST_AND_PATH    = portal.localhost/api/v1
 DOCS_SCHEME          = http
 DOCS_HOST            = developer.localhost
 PORTAL_SCHEME        = http

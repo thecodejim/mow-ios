@@ -3,7 +3,7 @@
 APP_ENVIRONMENT_NAME = stage
 APP_SWIFT_FLAGS      = ENV_STAGE
 API_SCHEME           = https
-API_HOST_AND_PATH    = api.stage.mow.codejim.com/api/v1
+API_HOST_AND_PATH    = portal.stage.mow.codejim.com/api/v1
 DOCS_SCHEME          = https
 DOCS_HOST            = developer.stage.mow.codejim.com
 PORTAL_SCHEME        = https
