@@ -214,12 +214,21 @@ private extension OnboardingDomain.State {
     }
 }
 
-#Preview {
+#Preview("en") {
     @Previewable @StateObject var coordinator: AppCoordinator = {
         let dependencies = AppDependencies.mock(environment: .preview)
         return AppCoordinator(dependencies: dependencies)
     }()
     
     OnboardingRootView(store: coordinator.onboardingStore)
-//        .environment(\.locale, .init(identifier: "es"))
+}
+
+#Preview("es") {
+    @Previewable @StateObject var coordinator: AppCoordinator = {
+        let dependencies = AppDependencies.mock(environment: .preview)
+        return AppCoordinator(dependencies: dependencies)
+    }()
+    
+    OnboardingRootView(store: coordinator.onboardingStore)
+        .environment(\.locale, .init(identifier: "es"))
 }

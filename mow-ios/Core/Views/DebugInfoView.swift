@@ -214,7 +214,11 @@ struct DebugInfoButton: View {
     }
 }
 
-#Preview {
+#Preview("en") {
     DebugInfoView(environment: .preview, deviceInfo: MockDeviceInfoService(), logHistory: MockLogHistoryProvider())
-//        .environment(\.locale, .init(identifier: "es"))
+}
+
+#Preview("es") {
+    DebugInfoView(environment: .preview, deviceInfo: MockDeviceInfoService(), logHistory: MockLogHistoryProvider())
+        .environment(\.locale, .init(identifier: "es"))
 }

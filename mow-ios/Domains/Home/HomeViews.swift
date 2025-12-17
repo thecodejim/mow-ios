@@ -285,7 +285,7 @@ private extension HomeDomain.State {
     }
 }
 
-#Preview {
+#Preview("en") {
     @Previewable @StateObject var coordinator: AppCoordinator = {
         let dependencies = AppDependencies.mock(environment: .preview)
         let coordinator = AppCoordinator(dependencies: dependencies)
@@ -295,5 +295,17 @@ private extension HomeDomain.State {
     }()
     
     HomeRootView(store: coordinator.homeStore)
-//        .environment(\.locale, .init(identifier: "es"))
+}
+
+#Preview("es") {
+    @Previewable @StateObject var coordinator: AppCoordinator = {
+        let dependencies = AppDependencies.mock(environment: .preview)
+        let coordinator = AppCoordinator(dependencies: dependencies)
+        // Set the initial route to home
+        coordinator.store.send(.showHome)
+        return coordinator
+    }()
+    
+    HomeRootView(store: coordinator.homeStore)
+        .environment(\.locale, .init(identifier: "es"))
 }

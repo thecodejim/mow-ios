@@ -326,9 +326,15 @@ private extension LogLevel {
     }
 }
 
-#Preview {
+#Preview("en") {
     NavigationStack {
         LogViewerView(logHistory: MockLogHistoryProvider())
-//            .environment(\.locale, .init(identifier: "es"))
+    }
+}
+
+#Preview("es") {
+    NavigationStack {
+        LogViewerView(logHistory: MockLogHistoryProvider())
+            .environment(\.locale, .init(identifier: "es"))
     }
 }

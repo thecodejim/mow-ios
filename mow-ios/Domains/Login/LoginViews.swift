@@ -256,7 +256,7 @@ private extension LoginDomain.State {
     }
 }
 
-#Preview {
+#Preview("en") {
     @Previewable @StateObject var coordinator: AppCoordinator = {
         let dependencies = AppDependencies.mock(environment: .preview)
         let coordinator = AppCoordinator(dependencies: dependencies)
@@ -266,5 +266,17 @@ private extension LoginDomain.State {
     }()
     
     LoginRootView(store: coordinator.loginStore)
-//        .environment(\.locale, .init(identifier: "es"))
+}
+
+#Preview("es") {
+    @Previewable @StateObject var coordinator: AppCoordinator = {
+        let dependencies = AppDependencies.mock(environment: .preview)
+        let coordinator = AppCoordinator(dependencies: dependencies)
+        // Set the initial route to login
+        coordinator.store.send(.showLogin)
+        return coordinator
+    }()
+    
+    LoginRootView(store: coordinator.loginStore)
+        .environment(\.locale, .init(identifier: "es"))
 }
