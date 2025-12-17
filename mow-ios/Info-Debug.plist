@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>MOWEnvironmentName</key>
+	<string>$(APP_ENVIRONMENT_NAME)</string>
+
+	<key>MOWAPIBaseURL</key>
+	<string>$(API_SCHEME)://$(API_HOST_AND_PATH)</string>
+
+	<key>MOWDocsURL</key>
+	<string>$(DOCS_SCHEME)://$(DOCS_HOST)</string>
+
+	<key>MOWPortalURL</key>
+	<string>$(PORTAL_SCHEME)://$(PORTAL_HOST)</string>
+
+	<key>MOWTelemetryURL</key>
+	<string>$(TELEMETRY_SCHEME)://$(TELEMETRY_HOST_PORT)</string>
+
+	<key>MOWHealthCheckToken</key>
+	<string>$(HEALTH_CHECK_TOKEN)</string>
+
+	<key>MOWUseMockData</key>
+	<string>$(USE_MOCK_DATA)</string>
+
+	<key>MOWLogLevel</key>
+	<string>$(LOG_LEVEL)</string>
+
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>portal.localhost</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSExceptionRequiresForwardSecrecy</key>
+				<false/>
+				<key>NSRequiresCertificateTransparency</key>
+				<false/>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>

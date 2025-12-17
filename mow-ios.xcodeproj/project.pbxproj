@@ -68,6 +68,7 @@
 		8E645231BB7C3B2014 /* TestMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMocks.swift; sourceTree = "<group>"; };
 		8E645231BB7C703015 /* StoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreTests.swift; sourceTree = "<group>"; };
 		8E645231BB7CB79016 /* AppDomainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDomainTests.swift; sourceTree = "<group>"; };
+		8E8139422EF3062800FD3013 /* Info-Debug.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Debug.plist"; sourceTree = "<group>"; };
 		8EAA00012F07438D00D61F5E /* App.base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.base.xcconfig; sourceTree = "<group>"; };
 		8EAA00022F07438D00D61F5E /* LocalDev.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = LocalDev.xcconfig; sourceTree = "<group>"; };
 		8EAA00032F07438D00D61F5E /* Stage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Stage.xcconfig; sourceTree = "<group>"; };
@@ -277,6 +278,7 @@
 		8ECEDBE62ED533EB00A79F73 /* mow-ios */ = {
 			isa = PBXGroup;
 			children = (
+				8E8139422EF3062800FD3013 /* Info-Debug.plist */,
 				8ECEDBE42ED533EB00A79F73 /* Info.plist */,
 				8ECEDBE32ED533EB00A79F73 /* Assets.xcassets */,
 				8E2DDC7F2EE0C2C8005C6035 /* Localizable.xcstrings */,
@@ -595,7 +597,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "mow-ios/Info.plist";
+				INFOPLIST_FILE = "mow-ios/Info-Debug.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
