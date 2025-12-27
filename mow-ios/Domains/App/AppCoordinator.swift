@@ -24,7 +24,7 @@ final class AppCoordinator: ObservableObject {
             ),
             login: .init(
                 appEnvironment: dependencies.environment,
-                api: dependencies.api,
+                api: dependencies.loginAPI,
                 sessionStore: dependencies.sessionStore,
                 analytics: dependencies.analytics,
                 deviceInfo: dependencies.deviceInfo,
@@ -33,7 +33,7 @@ final class AppCoordinator: ObservableObject {
             ),
             home: .init(
                 appEnvironment: dependencies.environment,
-                api: dependencies.api,
+                api: dependencies.homeAPI,
                 deviceInfo: dependencies.deviceInfo,
                 logger: dependencies.logger,
                 logHistory: dependencies.logHistory,

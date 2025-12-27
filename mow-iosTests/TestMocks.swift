@@ -1,50 +1,27 @@
 import Foundation
 @testable import mow_ios
 
-// MARK: - Test Mock API Service
+// MARK: - Test Mock Login API Service
 
-actor TestMockAPIService: APIService {
+actor TestMockLoginAPIService: LoginAPIService {
     private(set) var loginCallCount = 0
     private(set) var resetCallCount = 0
-    private(set) var fetchHomeCallCount = 0
     
     var loginResult: Result<AuthSession, Error>
     var resetResult: Result<Void, Error>
-    var homeSnapshotResult: Result<HomeSnapshot, Error>
 
     init(
         loginResult: Result<AuthSession, Error>,
-        resetResult: Result<Void, Error>,
-        homeSnapshotResult: Result<HomeSnapshot, Error>
+        resetResult: Result<Void, Error>
     ) {
         self.loginResult = loginResult
         self.resetResult = resetResult
-        self.homeSnapshotResult = homeSnapshotResult
     }
 
     @MainActor
     init() {
         self.loginResult = .success(AuthSession(token: "test-token", displayName: "Test User"))
         self.resetResult = .success(())
-        self.homeSnapshotResult = .success(Self.makeDefaultSnapshot())
-    }
-
-    @MainActor
-    private static func makeDefaultSnapshot() -> HomeSnapshot {
-        HomeSnapshot(
-            headline: "Test headline",
-            stats: [
-                .init(label: "Stat 1", value: "10", trend: "up"),
-                .init(label: "Stat 2", value: "20", trend: "down")
-            ],
-            meals: [
-                .init(title: "Test Meal", calories: 500, deliveryTime: Date())
-            ],
-            deliveries: [
-                .init(recipient: "Test Recipient", address: "123 Test St", distanceMiles: 1.5)
-            ],
-            profile: .init(name: "Test Name", role: "Test Role", territory: "Test Territory")
-        )
     }
     
     func login(email: String, password: String) async throws -> AuthSession {
@@ -69,6 +46,48 @@ actor TestMockAPIService: APIService {
         }
     }
     
+    func reset() {
+        loginCallCount = 0
+        resetCallCount = 0
+    }
+}
+
+// MARK: - Test Mock Home API Service
+
+actor TestMockHomeAPIService: HomeAPIService {
+    private(set) var fetchHomeCallCount = 0
+    
+    var homeSnapshotResult: Result<HomeSnapshot, Error>
+
+    init(
+        homeSnapshotResult: Result<HomeSnapshot, Error>
+    ) {
+        self.homeSnapshotResult = homeSnapshotResult
+    }
+
+    @MainActor
+    init() {
+        self.homeSnapshotResult = .success(Self.makeDefaultSnapshot())
+    }
+
+    @MainActor
+    private static func makeDefaultSnapshot() -> HomeSnapshot {
+        HomeSnapshot(
+            headline: "Test headline",
+            stats: [
+                .init(label: "Stat 1", value: "10", trend: "up"),
+                .init(label: "Stat 2", value: "20", trend: "down")
+            ],
+            meals: [
+                .init(title: "Test Meal", calories: 500, deliveryTime: Date())
+            ],
+            deliveries: [
+                .init(recipient: "Test Recipient", address: "123 Test St", distanceMiles: 1.5)
+            ],
+            profile: .init(name: "Test Name", role: "Test Role", territory: "Test Territory")
+        )
+    }
+    
     func fetchHomeSnapshot() async throws -> HomeSnapshot {
         fetchHomeCallCount += 1
         
@@ -81,8 +100,6 @@ actor TestMockAPIService: APIService {
     }
     
     func reset() {
-        loginCallCount = 0
-        resetCallCount = 0
         fetchHomeCallCount = 0
     }
 }
@@ -280,7 +297,8 @@ extension AppEnvironment {
 func createTestAppEnvironment() -> AppDomain.Environment {
     let logger = TestMockLogger()
     let logHistory = MockLogHistoryProvider()
-    let api = TestMockAPIService()
+    let loginAPI = TestMockLoginAPIService()
+    let homeAPI = TestMockHomeAPIService()
     let onboardingStore = TestOnboardingStore()
     let sessionStore = TestSessionStore()
     let homeSnapshotStore = TestHomeSnapshotStore()
@@ -298,7 +316,7 @@ func createTestAppEnvironment() -> AppDomain.Environment {
         ),
         login: LoginDomain.Environment(
             appEnvironment: appEnv,
-            api: api,
+            api: loginAPI,
             sessionStore: sessionStore,
             analytics: analytics,
             deviceInfo: deviceInfo,
@@ -307,7 +325,7 @@ func createTestAppEnvironment() -> AppDomain.Environment {
         ),
         home: HomeDomain.Environment(
             appEnvironment: appEnv,
-            api: api,
+            api: homeAPI,
             deviceInfo: deviceInfo,
             logger: logger,
             logHistory: logHistory,

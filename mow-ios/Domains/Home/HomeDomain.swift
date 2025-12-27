@@ -3,7 +3,7 @@ import Foundation
 enum HomeDomain {
     struct Environment {
         let appEnvironment: AppEnvironment
-        let api: APIService
+        let api: HomeAPIService
         let deviceInfo: DeviceInfoService
         let logger: Logger
         let logHistory: LogHistoryProviding

@@ -3,7 +3,7 @@ import Foundation
 enum LoginDomain {
     struct Environment {
         let appEnvironment: AppEnvironment
-        let api: APIService
+        let api: LoginAPIService
         let sessionStore: SessionStoring
         let analytics: AnalyticsService
         let deviceInfo: DeviceInfoService

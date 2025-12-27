@@ -1,11 +1,5 @@
 import Foundation
 
-protocol APIService: Sendable {
-    func login(email: String, password: String) async throws -> AuthSession
-    func sendPasswordReset(email: String) async throws
-    func fetchHomeSnapshot() async throws -> HomeSnapshot
-}
-
 protocol AnalyticsService: Sendable {
     func track(event: String, metadata: [String: String]) async
 }
@@ -14,7 +8,8 @@ struct AppDependencies {
     let environment: AppEnvironment
     let logger: Logger
     let logHistory: LogHistoryProviding
-    let api: APIService
+    let loginAPI: LoginAPIService
+    let homeAPI: HomeAPIService
     let analytics: AnalyticsService
     let deviceInfo: DeviceInfoService
     let onboardingStore: OnboardingProgressStoring
@@ -25,7 +20,8 @@ struct AppDependencies {
         environment: AppEnvironment,
         logger: Logger,
         logHistory: LogHistoryProviding,
-        api: APIService,
+        loginAPI: LoginAPIService,
+        homeAPI: HomeAPIService,
         analytics: AnalyticsService,
         deviceInfo: DeviceInfoService,
         onboardingStore: OnboardingProgressStoring,
@@ -35,7 +31,8 @@ struct AppDependencies {
         self.environment = environment
         self.logger = logger
         self.logHistory = logHistory
-        self.api = api
+        self.loginAPI = loginAPI
+        self.homeAPI = homeAPI
         self.analytics = analytics
         self.deviceInfo = deviceInfo
         self.onboardingStore = onboardingStore
@@ -60,11 +57,16 @@ struct AppDependencies {
         session = URLSession(configuration: .default)
         #endif
 
+        let httpClient = HTTPClient(session: session)
+        let loginAPI = LiveLoginAPIService(baseURL: environment.apiBaseURL, client: httpClient)
+        let homeAPI = MockHomeAPIService()
+
         return AppDependencies(
             environment: environment,
             logger: logging.logger,
             logHistory: logging.history,
-            api: LiveAPIService(baseURL: environment.apiBaseURL, session: session),
+            loginAPI: loginAPI,
+            homeAPI: homeAPI,
             analytics: MockAnalyticsService(),
             deviceInfo: LiveDeviceInfoService(),
             onboardingStore: onboardingStore,
@@ -78,7 +80,8 @@ struct AppDependencies {
             environment: environment,
             logger: MockLogger(),
             logHistory: MockLogHistoryProvider(),
-            api: MockAPIService(),
+            loginAPI: MockLoginAPIService(),
+            homeAPI: MockHomeAPIService(),
             analytics: MockAnalyticsService(),
             deviceInfo: MockDeviceInfoService(),
             onboardingStore: InMemoryOnboardingStore(),
@@ -176,65 +179,8 @@ struct HomeSnapshot: Equatable, Codable {
     }
 }
 
+
 // MARK: - Mock services
-
-enum MockAPIError: Error, LocalizedError, Equatable {
-    case invalidCredentials
-    case offline
-
-    var errorDescription: String? {
-        switch self {
-        case .invalidCredentials:
-            "That email and password combo does not look right."
-        case .offline:
-            "We could not reach the server. Please try again."
-        }
-    }
-}
-
-struct MockAPIService: APIService {
-    func login(email: String, password: String) async throws -> AuthSession {
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-
-        guard password.lowercased() == "password" else {
-            throw MockAPIError.invalidCredentials
-        }
-
-        return AuthSession(token: UUID().uuidString, displayName: email.components(separatedBy: "@").first ?? "Volunteer")
-    }
-
-    func sendPasswordReset(email: String) async throws {
-        try await Task.sleep(nanoseconds: 600_000_000)
-
-        if email.isEmpty {
-            throw MockAPIError.invalidCredentials
-        }
-    }
-
-    func fetchHomeSnapshot() async throws -> HomeSnapshot {
-        try await Task.sleep(nanoseconds: 800_000_000)
-
-        return HomeSnapshot(
-            headline: "You have 12 meals and 4 routes today.",
-            stats: [
-                .init(label: "Families Served", value: "32", trend: "+4 vs yesterday"),
-                .init(label: "Miles", value: "18.4", trend: "On track"),
-                .init(label: "Volunteer Hours", value: "6h 15m", trend: "Ahead of plan")
-            ],
-            meals: [
-                .init(title: "Low-sodium chicken bowl", calories: 540, deliveryTime: .now.addingTimeInterval(1_800)),
-                .init(title: "Gluten-free pasta", calories: 610, deliveryTime: .now.addingTimeInterval(3_600)),
-                .init(title: "Fresh salad kit", calories: 320, deliveryTime: .now.addingTimeInterval(7_200))
-            ],
-            deliveries: [
-                .init(recipient: "The Johnson Family", address: "18 W 34th St", distanceMiles: 1.3),
-                .init(recipient: "Ms. Chen", address: "44 Spring Ave", distanceMiles: 2.1),
-                .init(recipient: "The Rivera Household", address: "220 Beacon Rd", distanceMiles: 4.8)
-            ],
-            profile: .init(name: "Taylor West", role: "Lead Volunteer", territory: "North Austin")
-        )
-    }
-}
 
 struct MockAnalyticsService: AnalyticsService {
     func track(event: String, metadata: [String: String]) async {
