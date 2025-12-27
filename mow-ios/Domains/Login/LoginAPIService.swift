@@ -51,6 +51,16 @@ struct LiveLoginAPIService: LoginAPIService {
 
 // MARK: - DTOs
 
+struct AuthSession: Equatable, Codable {
+    let token: String
+    let displayName: String
+
+    init(token: String, displayName: String) {
+        self.token = token
+        self.displayName = displayName
+    }
+}
+
 extension LiveLoginAPIService {
     struct LoginRequest: Codable {
         let username: String

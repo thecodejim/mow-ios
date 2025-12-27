@@ -323,3 +323,35 @@ struct KeychainSessionStore: SessionStoring {
         }
     }
 }
+
+// MARK: - Mock services
+
+final class InMemoryOnboardingStore: OnboardingProgressStoring {
+    private var completed = false
+
+    func hasCompletedOnboarding() -> Bool { completed }
+
+    func markCompleted() {
+        completed = true
+    }
+
+    func reset() {
+        completed = false
+    }
+}
+
+final class InMemorySessionStore: SessionStoring {
+    private var session: AuthSession?
+
+    func store(session: AuthSession) throws {
+        self.session = session
+    }
+
+    func loadSession() throws -> AuthSession? {
+        session
+    }
+
+    func clearSession() throws {
+        session = nil
+    }
+}

@@ -238,3 +238,21 @@ final class SwiftDataHomeSnapshotStore: HomeSnapshotStoring {
         }
     }
 }
+
+// MARK: - Mock services
+
+actor InMemoryHomeSnapshotStore: HomeSnapshotStoring {
+    private var snapshot: HomeSnapshot?
+
+    func latestSnapshot() async throws -> HomeSnapshot? {
+        snapshot
+    }
+
+    func save(_ snapshot: HomeSnapshot) async throws {
+        self.snapshot = snapshot
+    }
+
+    func clear() async throws {
+        snapshot = nil
+    }
+}
